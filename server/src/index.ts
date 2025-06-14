@@ -17,6 +17,7 @@ import { Request } from 'express';
 dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
@@ -24,9 +25,10 @@ app.use(express.json());
 app.use(morgan('dev'));
 app.use(helmet());
 
-// Add a test route to confirm the correct backend is running
+// Basic test endpoint - must be before any auth middleware
 app.get('/api/test', (req, res) => {
-  res.send('Test route is working');
+  console.log('Test endpoint hit');
+  res.status(200).json({ status: 'ok', message: 'Server is running' });
 });
 
 // Routes
@@ -271,15 +273,17 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 });
 
 // Connect to MongoDB
-mongoose
-  .connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/app-dedupe')
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/app-deduplicator')
   .then(() => {
     console.log('Connected to MongoDB');
-    const port = process.env.PORT || 3001;
-    app.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
+    // Start server only after DB connection is established
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+      console.log('Environment:', process.env.NODE_ENV);
+      console.log('MongoDB URI:', process.env.MONGODB_URI ? 'Set' : 'Not set');
     });
   })
   .catch((error) => {
     console.error('MongoDB connection error:', error);
+    process.exit(1);
   }); 

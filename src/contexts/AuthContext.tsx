@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import config from '../config';
 
 interface User {
   _id: string;
@@ -27,7 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (token) {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         try {
-          const response = await axios.get('http://localhost:3001/api/users/me');
+          const response = await axios.get(`${config.apiUrl}/api/users/me`);
           setUser(response.data);
         } catch {
           localStorage.removeItem('token');
@@ -45,7 +46,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await axios.post('http://localhost:3001/api/users/login', {
+      const response = await axios.post(`${config.apiUrl}/api/users/login`, {
         email,
         password,
       });

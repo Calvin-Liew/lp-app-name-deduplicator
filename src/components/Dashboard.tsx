@@ -47,6 +47,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import { useUserStats } from '../contexts/UserStatsContext';
+import config from '../config';
 
 interface Stats {
   totalApps: number;
@@ -90,7 +91,7 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/leaderboard`, {
+        const response = await axios.get(`${config.apiUrl}/api/leaderboard`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

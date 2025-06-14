@@ -13,6 +13,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import config from '../config';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -67,7 +68,7 @@ const Login: React.FC = () => {
     setError('');
 
     try {
-      await axios.post('http://localhost:3001/api/users/register', {
+      await axios.post(`${config.apiUrl}/api/users/register`, {
         name,
         email,
         password,

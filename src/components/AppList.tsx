@@ -25,6 +25,7 @@ import {
 } from '@mui/icons-material';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
+import config from '../config';
 
 interface App {
   _id: string;
@@ -71,7 +72,7 @@ const AppList: React.FC<AppListProps> = ({ type }) => {
 
   const fetchApps = async () => {
     try {
-      let url = 'http://localhost:3001/api/apps';
+      let url = `${config.apiUrl}/api/apps`;
       if (type === 'confirmed') {
         url += '?confirmed=true';
       } else if (type === 'unconfirmed') {
@@ -93,7 +94,7 @@ const AppList: React.FC<AppListProps> = ({ type }) => {
   const fetchClusters = async () => {
     try {
       console.log('Fetching clusters with token:', token);
-      const response = await axios.get('http://localhost:3001/api/clusters', {
+      const response = await axios.get(`${config.apiUrl}/api/clusters`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -109,7 +110,7 @@ const AppList: React.FC<AppListProps> = ({ type }) => {
     if (!selectedApp || !selectedCluster) return;
 
     try {
-      await axios.patch(`http://localhost:3001/api/apps/${selectedApp._id}`, {
+      await axios.patch(`${config.apiUrl}/api/apps/${selectedApp._id}`, {
         cluster: selectedCluster._id,
       }, {
         headers: {
@@ -127,7 +128,7 @@ const AppList: React.FC<AppListProps> = ({ type }) => {
 
   const handleConfirmApp = async (appId: string) => {
     try {
-      await axios.patch(`http://localhost:3001/api/apps/${appId}/confirm`, {}, {
+      await axios.patch(`${config.apiUrl}/api/apps/${appId}/confirm`, {}, {
         headers: {
           Authorization: `Bearer ${token}`
         }
