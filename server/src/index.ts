@@ -24,6 +24,11 @@ app.use(express.json());
 app.use(morgan('dev'));
 app.use(helmet());
 
+// Add a test route to confirm the correct backend is running
+app.get('/api/test', (req, res) => {
+  res.send('Test route is working');
+});
+
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/apps', auth, appRoutes);
@@ -170,14 +175,6 @@ app.get('/api/stats', auth, async (req: AuthRequest, res) => {
     console.error('Error fetching stats:', e);
     res.status(500).send(e);
   }
-});
-
-// Routes
-app.use('/api', auth, adminRoutes);
-
-// Add a test route to confirm the correct backend is running
-app.get('/api/test', (req, res) => {
-  res.send('Test route is working');
 });
 
 interface AuthRequest extends Request {
