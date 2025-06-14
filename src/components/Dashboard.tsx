@@ -90,7 +90,7 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/api/leaderboard', {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/leaderboard`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
