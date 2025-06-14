@@ -31,7 +31,7 @@ app.use('/api/clusters', auth_1.auth, clusters_1.default);
 app.use('/api/admin', auth_1.auth, admin_1.default);
 // Stats endpoint for dashboard
 app.get('/api/stats', auth_1.auth, async (req, res) => {
-    var _a, _b, _c;
+    var _a, _b, _c, _d;
     try {
         console.log('Fetching stats for user:', (_a = req.user) === null || _a === void 0 ? void 0 : _a.id);
         const totalApps = await AppName_1.AppName.countDocuments();
@@ -137,6 +137,8 @@ app.get('/api/stats', auth_1.auth, async (req, res) => {
                 unlockedBy: unconfirmedApps === 0 ? 'Team' : undefined
             }
         ];
+        // Count of apps confirmed by the current user
+        const personalConfirmedApps = await AppName_1.AppName.countDocuments({ confirmed: true, confirmedBy: (_d = req.user) === null || _d === void 0 ? void 0 : _d.id });
         const stats = {
             totalApps,
             confirmedApps,
@@ -146,6 +148,7 @@ app.get('/api/stats', auth_1.auth, async (req, res) => {
             streak,
             xp,
             level,
+            personalConfirmedApps,
             teamStats: {
                 totalConfirmed: confirmedApps,
                 totalUsers,

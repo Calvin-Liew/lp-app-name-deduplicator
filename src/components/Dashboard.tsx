@@ -58,6 +58,7 @@ interface Stats {
   level?: number;
   achievements?: Achievement[];
   teamStats: TeamStats;
+  personalConfirmedApps: number;
 }
 
 interface TeamStats {
@@ -80,7 +81,7 @@ interface Achievement {
 }
 
 const Dashboard: React.FC = () => {
-  const { stats, loading } = useUserStats();
+  const { stats, loading, refreshStats } = useUserStats();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { user, logout, token } = useAuth();
   const navigate = useNavigate();
@@ -103,6 +104,14 @@ const Dashboard: React.FC = () => {
       fetchLeaderboard();
     }
   }, [token]);
+
+  // Auto-refresh stats on mount and when window regains focus
+  useEffect(() => {
+    refreshStats();
+    const handleFocus = () => refreshStats();
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [refreshStats]);
 
   const handleNavigation = (path: string) => {
     navigate(path);
@@ -217,9 +226,33 @@ const Dashboard: React.FC = () => {
                     {user?.name?.[0]?.toUpperCase()}
                   </Avatar>
                   <Box>
-                    <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-                      {user?.name}
-                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+                        {user?.name}
+                      </Typography>
+                      {(() => {
+                        const userIdx = leaderboard.findIndex(l => l.userId === user?._id);
+                        let rankStyle = {};
+                        let rankIcon = null;
+                        if (userIdx === 0) {
+                          rankStyle = { color: '#FFD700', fontWeight: 'bold', fontSize: 32 };
+                          rankIcon = '🥇';
+                        } else if (userIdx === 1) {
+                          rankStyle = { color: '#C0C0C0', fontWeight: 'bold', fontSize: 28 };
+                          rankIcon = '🥈';
+                        } else if (userIdx === 2) {
+                          rankStyle = { color: '#CD7F32', fontWeight: 'bold', fontSize: 24 };
+                          rankIcon = '🥉';
+                        } else if (userIdx > 2) {
+                          rankStyle = { color: '#888', fontWeight: 'bold', fontSize: 20 };
+                        }
+                        return userIdx !== -1 ? (
+                          <span style={rankStyle}>{rankIcon || userIdx + 1}</span>
+                        ) : (
+                          <span style={{ color: '#bbb', fontWeight: 'bold', fontSize: 18 }}>N/A</span>
+                        );
+                      })()}
+                    </Box>
                     <Typography variant="body2" sx={{ opacity: 0.9 }}>
                       Level {stats.level || 1} • {stats.xp || 0} XP
                     </Typography>
@@ -291,7 +324,7 @@ const Dashboard: React.FC = () => {
                           <CheckCircleIcon sx={{ fontSize: 20 }} />
                         </Box>
                       }
-                      label={`${stats.confirmedApps || 0} Confirmed`}
+                      label={`${stats.personalConfirmedApps || 0} Confirmed by You`}
                       sx={{ 
                         bgcolor: 'rgba(255,255,255,0.25)', 
                         color: 'white',
@@ -462,20 +495,40 @@ const Dashboard: React.FC = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {Array.isArray(leaderboard) && leaderboard.map((row, idx) => (
-                    <TableRow key={row.userId}>
-                      <TableCell>{idx + 1}</TableCell>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Avatar sx={{ width: 28, height: 28, bgcolor: 'primary.main' }}>{row.name[0]}</Avatar>
-                          <Typography variant="body2" color="text.primary">{row.name}</Typography>
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body2" color="text.primary">{row.count}</Typography>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {Array.isArray(leaderboard) && leaderboard.map((row, idx) => {
+                    let rankStyle = {};
+                    let rankIcon = null;
+                    if (idx === 0) {
+                      rankStyle = { color: '#FFD700', fontWeight: 'bold', fontSize: 32 };
+                      rankIcon = '🥇';
+                    } else if (idx === 1) {
+                      rankStyle = { color: '#C0C0C0', fontWeight: 'bold', fontSize: 28 };
+                      rankIcon = '🥈';
+                    } else if (idx === 2) {
+                      rankStyle = { color: '#CD7F32', fontWeight: 'bold', fontSize: 24 };
+                      rankIcon = '🥉';
+                    } else {
+                      rankStyle = { color: '#888', fontWeight: 'bold', fontSize: 20 };
+                    }
+                    return (
+                      <TableRow key={row.userId}>
+                        <TableCell>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <span style={rankStyle}>{rankIcon || idx + 1}</span>
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Avatar sx={{ width: 28, height: 28, bgcolor: 'primary.main' }}>{row.name[0]}</Avatar>
+                            <Typography variant="body2" color="text.primary">{row.name}</Typography>
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2" color="text.primary">{row.count}</Typography>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                   {(!Array.isArray(leaderboard) || leaderboard.length === 0) && (
                     <TableRow>
                       <TableCell colSpan={3} align="center">

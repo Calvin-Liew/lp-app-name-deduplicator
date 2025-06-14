@@ -21,6 +21,7 @@ export interface UserStats {
   pendingReviews: number;
   teamStats?: any;
   achievements?: Achievement[];
+  personalConfirmedApps?: number;
 }
 
 interface UserStatsContextType {
@@ -39,6 +40,7 @@ const defaultStats: UserStats = {
   pendingReviews: 0,
   teamStats: {},
   achievements: [],
+  personalConfirmedApps: 0,
 };
 
 const UserStatsContext = createContext<UserStatsContextType>({
@@ -74,6 +76,7 @@ export const UserStatsProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         pendingReviews: response.data.pendingReviews || 0,
         teamStats: response.data.teamStats || {},
         achievements: response.data.achievements || [],
+        personalConfirmedApps: response.data.personalConfirmedApps || 0,
       });
     } catch (e) {
       // Optionally handle error

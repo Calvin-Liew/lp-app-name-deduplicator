@@ -141,6 +141,9 @@ app.get('/api/stats', auth, async (req: AuthRequest, res) => {
       }
     ];
     
+    // Count of apps confirmed by the current user
+    const personalConfirmedApps = await AppName.countDocuments({ confirmed: true, confirmedBy: req.user?.id });
+
     const stats = {
       totalApps,
       confirmedApps,
@@ -150,6 +153,7 @@ app.get('/api/stats', auth, async (req: AuthRequest, res) => {
       streak,
       xp,
       level,
+      personalConfirmedApps,
       teamStats: {
         totalConfirmed: confirmedApps,
         totalUsers,
