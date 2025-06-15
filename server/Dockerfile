@@ -1,15 +1,16 @@
 FROM node:18-alpine
 
-WORKDIR /app/server
+# Set working directory
+WORKDIR /app
 
 # Copy package files
-COPY server/package*.json ./
+COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
 # Copy source code
-COPY server/ ./
+COPY . .
 
 # Build TypeScript
 RUN npm run build

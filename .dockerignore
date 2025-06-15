@@ -1,8 +1,13 @@
-node_modules
-npm-debug.log
-dist
+**/node_modules
+**/npm-debug.log
+**/dist
 .git
 .gitignore
 .env
 .env.local
-.env.*.local 
+.env.*.local
+README.md
+**/.DS_Store
+**/coverage
+**/.env
+**/.env.* 
