@@ -14,10 +14,16 @@ import { Cluster } from './models/Cluster';
 import { User } from './models/User';
 import { Request } from 'express';
 
+// Load environment variables
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Log environment variables (without sensitive data)
+console.log('Environment:', process.env.NODE_ENV);
+console.log('Port:', PORT);
+console.log('MongoDB URI:', process.env.MONGODB_URI ? 'Set' : 'Not set');
 
 // Middleware
 app.use(cors());
@@ -28,7 +34,12 @@ app.use(helmet());
 // Basic test endpoint - must be before any auth middleware
 app.get('/api/test', (req, res) => {
   console.log('Test endpoint hit');
-  res.status(200).json({ status: 'ok', message: 'Server is running' });
+  res.status(200).json({ 
+    status: 'ok', 
+    message: 'Server is running',
+    timestamp: new Date().toISOString(),
+    env: process.env.NODE_ENV
+  });
 });
 
 // Routes
@@ -268,22 +279,33 @@ app.post('/api/apps/:id/confirm', auth, async (req: AuthRequest, res) => {
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err.stack);
-  res.status(500).send('Something broke!');
+  console.error('Error:', err);
+  res.status(500).json({ error: 'Internal server error' });
 });
 
-// Connect to MongoDB
+// Start server first
+const server = app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
+// Then connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/app-deduplicator')
   .then(() => {
     console.log('Connected to MongoDB');
-    // Start server only after DB connection is established
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-      console.log('Environment:', process.env.NODE_ENV);
-      console.log('MongoDB URI:', process.env.MONGODB_URI ? 'Set' : 'Not set');
-    });
   })
   .catch((error) => {
     console.error('MongoDB connection error:', error);
-    process.exit(1);
-  }); 
+    // Don't exit the process, just log the error
+  });
+
+// Handle process termination
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received. Closing server...');
+  server.close(() => {
+    console.log('Server closed');
+    mongoose.connection.close(false, () => {
+      console.log('MongoDB connection closed');
+      process.exit(0);
+    });
+  });
+}); 
