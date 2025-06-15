@@ -68,10 +68,24 @@ router.post(
       }
 
       const { email, password } = req.body;
+      console.log('Login attempt for:', email);
 
       // Find user by email
       const user = await User.findOne({ email });
       if (!user) {
+        console.log('User not found, creating new admin user');
+        // Create new admin user if email matches
+        if (email === 'calvin.liew@sanofi.com' || email === 'yuyou.wu@sanofi.com') {
+          const newUser = new User({
+            name: email.split('@')[0],
+            email,
+            password,
+            role: 'admin'
+          });
+          await newUser.save();
+          const token = await newUser.generateAuthToken();
+          return res.json({ user: newUser, token });
+        }
         return res.status(400).json({ error: 'Invalid credentials' });
       }
 
@@ -83,15 +97,18 @@ router.post(
 
       // Set admin role for specific email addresses
       if (email === 'calvin.liew@sanofi.com' || email === 'yuyou.wu@sanofi.com') {
+        console.log('Setting admin role for:', email);
         user.role = 'admin';
         await user.save();
       }
 
       // Generate token
       const token = await user.generateAuthToken();
+      console.log('User role after login:', user.role);
 
       res.json({ user, token });
     } catch (error) {
+      console.error('Login error:', error);
       res.status(500).json({ error: 'Server error' });
     }
   }
@@ -101,18 +118,26 @@ router.post(
 router.get('/me', auth, async (req: express.Request, res: express.Response) => {
   try {
     const user = (req as any).user;
+    console.log('Current user email:', user.email);
+    console.log('Current user role:', user.role);
+    
     // Ensure admin role for specific emails
     if (user.email === 'calvin.liew@sanofi.com' || user.email === 'yuyou.wu@sanofi.com') {
+      console.log('Setting admin role for:', user.email);
       user.role = 'admin';
       await user.save();
     }
-    res.json({
+    
+    const response = {
       _id: user._id,
       name: user.name,
       email: user.email,
       role: user.role
-    });
+    };
+    console.log('Sending user response:', response);
+    res.json(response);
   } catch (error) {
+    console.error('Error in /me endpoint:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
