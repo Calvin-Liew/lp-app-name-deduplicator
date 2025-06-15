@@ -14,10 +14,12 @@ import { Cluster } from './models/Cluster';
 import { User } from './models/User';
 import { Request } from 'express';
 
-// Load environment variables
-dotenv.config();
+// Load environment variables (only for local development)
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 
-// Debug logging
+// Debug logging (without sensitive data)
 console.log('Environment:', process.env.NODE_ENV);
 console.log('Port:', process.env.PORT);
 console.log('MongoDB URI:', process.env.MONGODB_URI ? 'Set' : 'Not set');
@@ -57,18 +59,30 @@ const server = app.listen(PORT, () => {
 
 // Then connect to MongoDB
 console.log('Attempting to connect to MongoDB...');
-const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/app-deduplicator';
-console.log('Using MongoDB URI:', mongoUri.replace(/\/\/[^:]+:[^@]+@/, '//<credentials>@')); // Hide credentials in logs
+if (!process.env.MONGODB_URI) {
+  console.error('MONGODB_URI environment variable is not set!');
+  process.exit(1);
+}
+
+const mongoUri = process.env.MONGODB_URI;
+// Log connection attempt (hiding credentials)
+console.log('Using MongoDB URI:', mongoUri.replace(/\/\/[^:]+:[^@]+@/, '//<credentials>@'));
 
 mongoose.connect(mongoUri, {
   serverSelectionTimeoutMS: 5000,
   socketTimeoutMS: 45000,
 })
   .then(() => {
-    console.log('Connected to MongoDB');
+    console.log('Connected to MongoDB successfully');
   })
   .catch((error) => {
     console.error('MongoDB connection error:', error);
+    console.error('Connection details:', {
+      uri: mongoUri.replace(/\/\/[^:]+:[^@]+@/, '//<credentials>@'),
+      error: error.message,
+      code: error.code,
+      name: error.name
+    });
     // Don't exit the process, just log the error
   });
 
