@@ -18,7 +18,29 @@ import { Request } from 'express';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+✕ [stage-0  8/10] RUN --mount=type=cache,id=s/603c105e-6a78-4ca9-b748-c2c3553e9f43-node_modules/cache,target=/app/node_modules/.cache npm install && npm run build 
+process "/bin/bash -ol pipefail -c npm install && npm run build" did not complete successfully: exit code: 1
+ 
+
+Dockerfile:24
+
+-------------------
+
+22 |     # build phase
+
+23 |     COPY . /app/.
+
+24 | >>> RUN --mount=type=cache,id=s/603c105e-6a78-4ca9-b748-c2c3553e9f43-node_modules/cache,target=/app/node_modules/.cache npm install && npm run build
+
+25 |
+
+26 |
+
+-------------------
+
+ERROR: failed to solve: process "/bin/bash -ol pipefail -c npm install && npm run build" did not complete successfully: exit code: 1
+
+Error: Docker build failedconst PORT = process.env.PORT || 3001;
 
 // Log environment variables (without sensitive data)
 console.log('Environment:', process.env.NODE_ENV);
@@ -303,7 +325,7 @@ process.on('SIGTERM', () => {
   console.log('SIGTERM received. Closing server...');
   server.close(() => {
     console.log('Server closed');
-    mongoose.connection.close(false, () => {
+    mongoose.connection.close(() => {
       console.log('MongoDB connection closed');
       process.exit(0);
     });

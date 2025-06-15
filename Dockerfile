@@ -12,6 +12,9 @@ RUN npm install
 # Copy source code
 COPY server/ ./
 
+# Install additional dependencies
+RUN npm install --save multer csv-parse bcrypt @types/multer @types/csv-parse @types/bcrypt
+
 # Build TypeScript
 RUN npm run build
 
