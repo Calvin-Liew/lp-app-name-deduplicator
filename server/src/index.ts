@@ -35,15 +35,10 @@ app.use(express.json());
 app.use(morgan('dev'));
 app.use(helmet());
 
-// Basic test endpoint - must be before any auth middleware
+// Test endpoint
 app.get('/api/test', (req, res) => {
   console.log('Test endpoint hit');
-  res.status(200).json({ 
-    status: 'ok', 
-    message: 'Server is running',
-    timestamp: new Date().toISOString(),
-    env: process.env.NODE_ENV
-  });
+  res.json({ message: 'Server is running' });
 });
 
 // Routes
@@ -53,8 +48,10 @@ app.use('/api/clusters', auth, clusterRoutes);
 app.use('/api/admin', auth, adminRoutes);
 
 // Start server first
+console.log('Starting server...');
 const server = app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  console.log('Test endpoint available at /api/test');
 });
 
 // Then connect to MongoDB
