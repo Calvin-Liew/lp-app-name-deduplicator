@@ -8,5 +8,5 @@ healthcheckPath = "/api/test"
 healthcheckTimeout = 300
 
 [env]
-MONGODB_URI = "${{MONGODB_URI}}"
+MONGODB_URI = "${{shared.MONGODB_URI}}"
 PORT = "8080" 
