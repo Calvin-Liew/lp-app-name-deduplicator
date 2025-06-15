@@ -130,7 +130,7 @@ const ClusterVerification: React.FC = () => {
 
   const handleConfirmApp = async (appId: string) => {
     try {
-      const response = await axios.post(
+      const response = await axios.patch(
         `${config.apiUrl}/api/apps/${appId}/confirm`,
         {},
         {
