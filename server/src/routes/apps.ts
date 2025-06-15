@@ -2,6 +2,7 @@ import express from 'express';
 import { body, validationResult } from 'express-validator';
 import { AppName } from '../models/AppName';
 import { Cluster } from '../models/Cluster';
+import { User } from '../models/User';
 
 const router = express.Router();
 
@@ -127,19 +128,89 @@ router.patch(
 // Confirm app
 router.patch('/:id/confirm', async (req: express.Request, res: express.Response) => {
   try {
+    console.log('Confirming app:', req.params.id);
+    console.log('User:', (req as any).user);
+
     const app = await AppName.findById(req.params.id);
     if (!app) {
+      console.log('App not found:', req.params.id);
       return res.status(404).json({ error: 'App not found' });
     }
 
-    const user = (req as any).user;
+    const user = await User.findById((req as any).user._id);
+    if (!user) {
+      console.log('User not found:', (req as any).user._id);
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    console.log('Current app state:', {
+      id: app._id,
+      name: app.name,
+      confirmed: app.confirmed,
+      confirmedBy: app.confirmedBy
+    });
+
+    // Update app
     app.confirmed = true;
     app.confirmedBy = user._id;
-    // app.status = 'confirmed'; // Removed because 'status' does not exist on AppName
-
     await app.save();
-    res.json(app);
+
+    // Update user stats
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Check if user has confirmed any apps today
+    const todayConfirmations = await AppName.countDocuments({
+      confirmedBy: user._id,
+      updatedAt: { $gte: today }
+    });
+
+    // Award XP (50 XP per confirmation)
+    user.xp += 50;
+
+    // Update streak
+    if (todayConfirmations === 1) {
+      // First confirmation of the day
+      user.streak += 1;
+      // Bonus XP for maintaining streak
+      if (user.streak > 1) {
+        user.xp += user.streak * 10; // Bonus XP based on streak
+      }
+    }
+
+    // Update daily confirmations
+    user.dailyConfirmations = todayConfirmations;
+    user.lastDailyReset = today;
+
+    await user.save();
+
+    console.log('App confirmed successfully:', {
+      id: app._id,
+      name: app.name,
+      confirmed: app.confirmed,
+      confirmedBy: app.confirmedBy
+    });
+
+    console.log('Updated user stats:', {
+      id: user._id,
+      name: user.name,
+      xp: user.xp,
+      level: user.level,
+      streak: user.streak,
+      dailyConfirmations: user.dailyConfirmations
+    });
+
+    res.json({
+      app,
+      user: {
+        xp: user.xp,
+        level: user.level,
+        streak: user.streak,
+        dailyConfirmations: user.dailyConfirmations
+      }
+    });
   } catch (error) {
+    console.error('Error confirming app:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });

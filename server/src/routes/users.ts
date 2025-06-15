@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/User';
 import { auth } from '../middleware/auth';
+import { AppName } from '../models/AppName';
 
 const router = express.Router();
 
@@ -106,6 +107,72 @@ router.post('/logout', auth, async (req: express.Request, res: express.Response)
     await user.save();
     res.json({ message: 'Logged out successfully' });
   } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Test endpoint for user stats
+router.get('/test-stats', auth, async (req: express.Request, res: express.Response) => {
+  try {
+    const user = (req as any).user;
+    console.log('Testing user stats for:', user._id);
+
+    // Get user's confirmed apps
+    const confirmedApps = await AppName.find({ confirmedBy: user._id });
+    console.log('Confirmed apps:', confirmedApps.length);
+
+    // Get user's streak
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const streakApps = await AppName.find({
+      confirmedBy: user._id,
+      updatedAt: { $gte: today }
+    });
+    console.log('Today\'s confirmations:', streakApps.length);
+
+    // Get leaderboard data
+    const leaderboard = await AppName.aggregate([
+      { $match: { confirmed: true } },
+      { $group: { _id: '$confirmedBy', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 10 },
+      {
+        $lookup: {
+          from: 'users',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'user'
+        }
+      },
+      { $unwind: '$user' }
+    ]);
+    console.log('Leaderboard data:', leaderboard);
+
+    res.json({
+      user: {
+        id: user._id,
+        name: user.name,
+        xp: user.xp,
+        level: user.level,
+        streak: user.streak
+      },
+      stats: {
+        totalConfirmed: confirmedApps.length,
+        todayConfirmed: streakApps.length,
+        confirmedApps: confirmedApps.map(app => ({
+          id: app._id,
+          name: app.name,
+          confirmedAt: app.updatedAt
+        }))
+      },
+      leaderboard: leaderboard.map(entry => ({
+        userId: entry._id,
+        name: entry.user.name,
+        count: entry.count
+      }))
+    });
+  } catch (error) {
+    console.error('Error in test-stats:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
