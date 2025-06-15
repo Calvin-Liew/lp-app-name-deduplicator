@@ -32,12 +32,27 @@ const Navbar: React.FC = () => {
   ];
 
   return (
-    <AppBar position="static" color="default" elevation={1}>
+    <AppBar 
+      position="static" 
+      color="default" 
+      elevation={1}
+      sx={{
+        bgcolor: 'background.paper',
+        borderBottom: '1px solid',
+        borderColor: 'divider',
+      }}
+    >
       <Toolbar>
         <Typography
           variant="h6"
           component="div"
-          sx={{ flexGrow: 1, color: theme.palette.primary.main, fontWeight: 'bold' }}
+          sx={{ 
+            flexGrow: 1, 
+            color: theme.palette.primary.main, 
+            fontWeight: 'bold',
+            cursor: 'pointer'
+          }}
+          onClick={() => navigate('/')}
         >
           App Name Deduplicator
         </Typography>
@@ -53,6 +68,9 @@ const Navbar: React.FC = () => {
                 '&:hover': {
                   backgroundColor: 'rgba(107, 122, 255, 0.08)',
                 },
+                '& .MuiSvgIcon-root': {
+                  color: location.pathname === item.path ? theme.palette.primary.main : 'inherit',
+                }
               }}
             >
               {item.label}

@@ -246,23 +246,29 @@ const Dashboard: React.FC = () => {
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Tooltip title="Current Streak">
                       <Chip
-                        icon={<FireIconAlt sx={{ color: '#FF6B00' }} />}
+                        icon={<FireIcon sx={{ color: '#FF6B00', fontSize: 20 }} />}
                         label={`${stats.streak || 0} Confirmation Streak`}
                         sx={{ 
                           bgcolor: 'rgba(255,255,255,0.25)', 
                           color: 'white',
-                          '& .MuiChip-label': { fontWeight: 600 }
+                          '& .MuiChip-label': { fontWeight: 600 },
+                          '&:hover': {
+                            bgcolor: 'rgba(255,255,255,0.35)',
+                          }
                         }}
                       />
                     </Tooltip>
                     <Tooltip title="Total Confirmations">
                       <Chip
-                        icon={<CheckCircleIcon sx={{ color: '#00C853' }} />}
+                        icon={<CheckCircleIcon sx={{ color: '#00C853', fontSize: 20 }} />}
                         label={`${stats.personalConfirmedApps || 0} Confirmed by You`}
                         sx={{ 
                           bgcolor: 'rgba(255,255,255,0.25)', 
                           color: 'white',
-                          '& .MuiChip-label': { fontWeight: 600 }
+                          '& .MuiChip-label': { fontWeight: 600 },
+                          '&:hover': {
+                            bgcolor: 'rgba(255,255,255,0.35)',
+                          }
                         }}
                       />
                     </Tooltip>
