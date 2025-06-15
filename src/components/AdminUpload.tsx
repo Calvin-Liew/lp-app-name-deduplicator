@@ -66,7 +66,11 @@ const AdminUpload: React.FC = () => {
 
   const handleExport = async () => {
     try {
-      const response = await axios.get('/api/admin/export-clusters');
+      const response = await axios.get(`${config.apiUrl}/api/admin/export-clusters`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
       const data = response.data;
       // Format for Excel: [{ Cluster: '...', 'App Names': 'a, b, c' }, ...]
       const rows = data.map((row: { cluster: string; apps: string[] }) => ({
@@ -78,7 +82,8 @@ const AdminUpload: React.FC = () => {
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Clusters');
       XLSX.writeFile(workbook, 'clusters_export.xlsx');
     } catch (err: any) {
-      setError('Export failed');
+      console.error('Export error:', err);
+      setError(err.response?.data?.error || 'Export failed');
     }
   };
 
