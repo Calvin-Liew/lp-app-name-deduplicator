@@ -11,70 +11,78 @@ import { UserStatsProvider } from './contexts/UserStatsContext';
 import PrivateRoute from './components/PrivateRoute';
 import Navbar from './components/Navbar';
 import theme from './theme';
-import { useAuth } from './contexts/AuthContext';
+import { useAuth, AuthProvider } from './contexts/AuthContext';
 import { Box } from '@mui/material';
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
   const { user } = useAuth();
 
   return (
+    <Router>
+      <Navbar />
+      <Box sx={{ p: 3, mt: 8 }}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/"
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/apps"
+            element={
+              <PrivateRoute>
+                <AppList type="all" />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/unconfirmed"
+            element={
+              <PrivateRoute>
+                <ClusterVerification />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/confirmed"
+            element={
+              <PrivateRoute>
+                <AppList type="confirmed" />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <PrivateRoute>
+                {user?.role === 'admin' ? (
+                  <AdminUpload />
+                ) : (
+                  <Navigate to="/" replace />
+                )}
+              </PrivateRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Box>
+    </Router>
+  );
+};
+
+const App: React.FC = () => {
+  return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <UserStatsProvider>
-        <Router>
-          <Navbar />
-          <Box sx={{ p: 3, mt: 8 }}>
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route
-                path="/"
-                element={
-                  <PrivateRoute>
-                    <Dashboard />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/apps"
-                element={
-                  <PrivateRoute>
-                    <AppList type="all" />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/unconfirmed"
-                element={
-                  <PrivateRoute>
-                    <ClusterVerification />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/confirmed"
-                element={
-                  <PrivateRoute>
-                    <AppList type="confirmed" />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/admin"
-                element={
-                  <PrivateRoute>
-                    {user?.role === 'admin' ? (
-                      <AdminUpload />
-                    ) : (
-                      <Navigate to="/" replace />
-                    )}
-                  </PrivateRoute>
-                }
-              />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Box>
-        </Router>
-      </UserStatsProvider>
+      <AuthProvider>
+        <UserStatsProvider>
+          <AppContent />
+        </UserStatsProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 };
