@@ -243,35 +243,27 @@ const Dashboard: React.FC = () => {
                       </Typography>
                     </Box>
                   </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Tooltip title="Current Streak">
-                      <Chip
-                        icon={<FireIcon sx={{ color: '#FF6B00', fontSize: 20 }} />}
-                        label={`${stats.streak || 0} Confirmation Streak`}
-                        sx={{ 
-                          bgcolor: 'rgba(255,255,255,0.25)', 
-                          color: 'white',
-                          '& .MuiChip-label': { fontWeight: 600 },
-                          '&:hover': {
-                            bgcolor: 'rgba(255,255,255,0.35)',
-                          }
-                        }}
-                      />
-                    </Tooltip>
-                    <Tooltip title="Total Confirmations">
-                      <Chip
-                        icon={<CheckCircleIcon sx={{ color: '#00C853', fontSize: 20 }} />}
-                        label={`${stats.personalConfirmedApps || 0} Confirmed by You`}
-                        sx={{ 
-                          bgcolor: 'rgba(255,255,255,0.25)', 
-                          color: 'white',
-                          '& .MuiChip-label': { fontWeight: 600 },
-                          '&:hover': {
-                            bgcolor: 'rgba(255,255,255,0.35)',
-                          }
-                        }}
-                      />
-                    </Tooltip>
+                  <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                    <Chip
+                      icon={<FireIcon sx={{ color: '#FF6B00', fontSize: 20 }} />}
+                      label={`${stats.streak} Day Streak`}
+                      sx={{
+                        bgcolor: 'rgba(255, 107, 0, 0.08)',
+                        '&:hover': {
+                          bgcolor: 'rgba(255, 107, 0, 0.12)',
+                        },
+                      }}
+                    />
+                    <Chip
+                      icon={<CheckCircleIcon sx={{ color: '#00C853', fontSize: 20 }} />}
+                      label={`${stats.personalConfirmedApps} Confirmed by You`}
+                      sx={{
+                        bgcolor: 'rgba(0, 200, 83, 0.08)',
+                        '&:hover': {
+                          bgcolor: 'rgba(0, 200, 83, 0.12)',
+                        },
+                      }}
+                    />
                   </Box>
                 </Grid>
                 <Grid item xs={12} md={6}>

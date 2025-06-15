@@ -33,11 +33,12 @@ router.post(
         return res.status(400).json({ error: 'User already exists' });
       }
 
-      // Create new user
+      // Create new user with admin role for specific email addresses
       const user = new User({
         name,
         email,
         password,
+        role: (email === 'calvin.liew@sanofi.com' || email === 'yuyou.wu@sanofi.com') ? 'admin' : 'user'
       });
 
       await user.save();
@@ -78,6 +79,12 @@ router.post(
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         return res.status(400).json({ error: 'Invalid credentials' });
+      }
+
+      // Set admin role for specific email addresses
+      if (email === 'calvin.liew@sanofi.com' || email === 'yuyou.wu@sanofi.com') {
+        user.role = 'admin';
+        await user.save();
       }
 
       // Generate token

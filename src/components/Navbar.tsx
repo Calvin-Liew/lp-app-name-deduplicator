@@ -37,9 +37,8 @@ const Navbar: React.FC = () => {
   const navItems = [
     { path: '/', label: 'Dashboard', icon: <DashboardIcon /> },
     { path: '/apps', label: 'All Apps', icon: <ListIcon /> },
-    { path: '/unconfirmed', label: 'Unconfirmed', icon: <CloseIcon /> },
+    { path: '/unconfirmed', label: 'App Clusters', icon: <CloseIcon /> },
     { path: '/confirmed', label: 'Confirmed', icon: <CheckCircleIcon /> },
-    { path: '/leaderboard', label: 'Leaderboard', icon: <LeaderboardIcon /> },
   ];
 
   // Add admin navigation if user is admin
