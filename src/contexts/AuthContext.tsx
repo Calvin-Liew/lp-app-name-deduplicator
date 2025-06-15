@@ -30,8 +30,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         try {
           const response = await axios.get(`${config.apiUrl}/api/users/me`);
+          console.log('User data from /me:', response.data);
           setUser(response.data);
-        } catch {
+        } catch (error) {
+          console.error('Error fetching user data:', error);
           localStorage.removeItem('token');
           setToken(null);
           setUser(null);
@@ -51,12 +53,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email,
         password,
       });
+      console.log('Login response:', response.data);
       const { token: newToken, user: userData } = response.data;
       localStorage.setItem('token', newToken);
       setToken(newToken);
       setUser(userData);
       axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
     } catch (error) {
+      console.error('Login error:', error);
       throw new Error('Login failed');
     }
   };
