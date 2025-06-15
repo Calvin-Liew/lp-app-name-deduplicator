@@ -57,7 +57,7 @@ const Login: React.FC = () => {
 
     try {
       await login(email, password);
-      navigate('/dashboard');
+      navigate('/');
     } catch (err) {
       setError('Invalid credentials');
     }
@@ -74,7 +74,7 @@ const Login: React.FC = () => {
         password,
       });
       await login(email, password);
-      navigate('/dashboard');
+      navigate('/');
     } catch (err: any) {
       setError(err.response?.data?.error || 'Registration failed');
     }
