@@ -6,6 +6,7 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DownloadIcon from '@mui/icons-material/Download';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
+import config from '../config';
 
 const AdminUpload: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -51,7 +52,7 @@ const AdminUpload: React.FC = () => {
     const formData = new FormData();
     formData.append('file', file);
     try {
-      await axios.post('http://localhost:3001/api/admin/upload-csv', formData, {
+      await axios.post(`${config.apiUrl}/api/admin/upload-csv`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setSuccess('CSV uploaded and ingested successfully!');

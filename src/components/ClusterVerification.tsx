@@ -39,6 +39,7 @@ import {
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserStats } from '../contexts/UserStatsContext';
+import config from '../config';
 
 interface App {
   _id: string;
@@ -97,7 +98,7 @@ const ClusterVerification: React.FC = () => {
   const fetchApps = async () => {
     try {
       // Fetch both confirmed and unconfirmed apps
-      const response = await axios.get('http://localhost:3001/api/apps', {
+      const response = await axios.get(`${config.apiUrl}/api/apps`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -112,7 +113,7 @@ const ClusterVerification: React.FC = () => {
 
   const fetchClusters = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/api/clusters', {
+      const response = await axios.get(`${config.apiUrl}/api/clusters`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -130,7 +131,7 @@ const ClusterVerification: React.FC = () => {
   const handleConfirmApp = async (appId: string) => {
     try {
       const response = await axios.post(
-        `http://localhost:3001/api/apps/${appId}/confirm`,
+        `${config.apiUrl}/api/apps/${appId}/confirm`,
         {},
         {
           headers: {
@@ -156,7 +157,7 @@ const ClusterVerification: React.FC = () => {
   const handleRemoveFromCluster = async (appId: string) => {
     try {
       await axios.patch(
-        `http://localhost:3001/api/apps/${appId}`,
+        `${config.apiUrl}/api/apps/${appId}`,
         { cluster: null },
         {
           headers: {
@@ -176,7 +177,7 @@ const ClusterVerification: React.FC = () => {
       if (!app) return;
 
       await axios.patch(
-        `http://localhost:3001/api/clusters/${app.cluster?._id}`,
+        `${config.apiUrl}/api/clusters/${app.cluster?._id}`,
         { canonicalName: app.name },
         {
           headers: {
@@ -194,7 +195,7 @@ const ClusterVerification: React.FC = () => {
     if (!selectedApp) return;
     try {
       await axios.patch(
-        `http://localhost:3001/api/apps/${selectedApp._id}`,
+        `${config.apiUrl}/api/apps/${selectedApp._id}`,
         { notes: note },
         {
           headers: {
@@ -214,7 +215,7 @@ const ClusterVerification: React.FC = () => {
     if (!moveTargetApp || !moveTargetClusterId) return;
     try {
       await axios.patch(
-        `http://localhost:3001/api/apps/${moveTargetApp._id}`,
+        `${config.apiUrl}/api/apps/${moveTargetApp._id}`,
         { cluster: moveTargetClusterId },
         {
           headers: {

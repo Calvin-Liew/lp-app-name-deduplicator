@@ -27,6 +27,7 @@ import {
 } from '@mui/icons-material';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
+import config from '../config';
 
 interface Cluster {
   _id: string;
@@ -72,7 +73,7 @@ const UnconfirmedApps: React.FC = () => {
 
   const fetchApps = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/api/apps/unconfirmed');
+      const response = await axios.get(`${config.apiUrl}/api/apps/unconfirmed`);
       setApps(response.data);
     } catch (error) {
       console.error('Error fetching apps:', error);
@@ -81,7 +82,7 @@ const UnconfirmedApps: React.FC = () => {
 
   const fetchClusters = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/api/clusters');
+      const response = await axios.get(`${config.apiUrl}/api/clusters`);
       setClusters(response.data);
     } catch (error) {
       console.error('Error fetching clusters:', error);
@@ -90,7 +91,7 @@ const UnconfirmedApps: React.FC = () => {
 
   const handleConfirm = async (appId: string) => {
     try {
-      await axios.patch(`http://localhost:3001/api/apps/${appId}/confirm`);
+      await axios.patch(`${config.apiUrl}/api/apps/${appId}/confirm`);
       await fetchApps();
     } catch (error) {
       console.error('Error confirming app:', error);
@@ -99,7 +100,7 @@ const UnconfirmedApps: React.FC = () => {
 
   const handleReject = async (appId: string) => {
     try {
-      await axios.delete(`http://localhost:3001/api/apps/${appId}`);
+      await axios.delete(`${config.apiUrl}/api/apps/${appId}`);
       await fetchApps();
     } catch (error) {
       console.error('Error rejecting app:', error);
@@ -109,7 +110,7 @@ const UnconfirmedApps: React.FC = () => {
   const handleUpdate = async () => {
     if (!selectedApp || !selectedCluster) return;
     try {
-      await axios.patch(`http://localhost:3001/api/apps/${selectedApp._id}`, {
+      await axios.patch(`${config.apiUrl}/api/apps/${selectedApp._id}`, {
         canonicalName,
         cluster: selectedCluster._id,
       });
