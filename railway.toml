@@ -1,14 +1,6 @@
 [build]
 builder = "DOCKERFILE"
-dockerfilePath = "server/Dockerfile"
 
 [deploy]
-startCommand = "cd server && node dist/index.js"
 healthcheckPath = "/api/test"
-healthcheckTimeout = 300
-healthcheckInterval = 10
-healthcheckRetries = 30
-
-[env]
-NODE_ENV = "production"
-PORT = "3001" 
+healthcheckTimeout = 300 

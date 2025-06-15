@@ -1,13 +1,41 @@
+# Dependencies
 **/node_modules
 **/npm-debug.log
+
+# Build outputs
 **/dist
+**/build
+
+# Version control
 .git
 .gitignore
-.env
-.env.local
-.env.*.local
-README.md
-**/.DS_Store
-**/coverage
+
+# Environment files
 **/.env
-**/.env.* 
+**/.env.*
+**/.env.local
+**/.env.*.local
+
+# IDE and OS files
+**/.DS_Store
+**/.idea
+**/.vscode
+**/*.swp
+**/*.swo
+
+# Documentation
+**/README.md
+**/CHANGELOG.md
+**/docs
+
+# Test files
+**/coverage
+**/__tests__
+**/*.test.*
+**/*.spec.*
+
+# Other
+**/.npmrc
+**/.yarnrc
+**/yarn.lock
+**/package-lock.json 
