@@ -136,21 +136,21 @@ router.get('/stats', async (req, res) => {
   }
 });
 
-// Export only clusters that are 100% confirmed
+// Export all clusters
 router.get('/export-clusters', async (req, res) => {
   try {
     const clusters = await Cluster.find();
     const data = await Promise.all(clusters.map(async (cluster) => {
       const apps = await AppName.find({ cluster: cluster._id });
-      const allConfirmed = apps.length > 0 && apps.every(app => app.confirmed);
-      if (!allConfirmed) return null;
       return {
         cluster: cluster.canonicalName || cluster.name,
-        apps: apps.map(app => app.name)
+        apps: apps.map(app => ({
+          name: app.name,
+          confirmed: app.confirmed
+        }))
       };
     }));
-    // Filter out nulls (clusters not 100% confirmed)
-    res.json(data.filter(Boolean));
+    res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Server error', details: error instanceof Error ? error.message : error });
   }

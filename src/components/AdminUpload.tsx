@@ -72,10 +72,10 @@ const AdminUpload: React.FC = () => {
         }
       });
       const data = response.data;
-      // Format for Excel: [{ Cluster: '...', 'App Names': 'a, b, c' }, ...]
-      const rows = data.map((row: { cluster: string; apps: string[] }) => ({
+      // Format for Excel: [{ Cluster: '...', 'App Names': 'a (Confirmed), b (Unconfirmed), c (Confirmed)' }, ...]
+      const rows = data.map((row: { cluster: string; apps: { name: string; confirmed: boolean }[] }) => ({
         'Cluster': row.cluster,
-        'App Names': row.apps.join(', ')
+        'App Names': row.apps.map(app => `${app.name} (${app.confirmed ? 'Confirmed' : 'Unconfirmed'})`).join(', ')
       }));
       const worksheet = XLSX.utils.json_to_sheet(rows);
       const workbook = XLSX.utils.book_new();
