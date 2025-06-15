@@ -208,140 +208,231 @@ const Dashboard: React.FC = () => {
           Dashboard
         </Typography>
 
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={6} md={4}>
-            <Card 
-              sx={{ 
-                cursor: 'pointer',
-                transition: 'transform 0.2s, box-shadow 0.2s',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: 3
-                }
-              }}
-              onClick={() => navigate('/apps')}
-            >
-              <CardContent>
-                <Typography color="textSecondary" gutterBottom>
-                  Total Apps
-                </Typography>
-                <Typography variant="h4">{stats.totalApps || 0}</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Card 
-              sx={{ 
-                cursor: 'pointer',
-                transition: 'transform 0.2s, box-shadow 0.2s',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: 3
-                }
-              }}
-              onClick={() => navigate('/unconfirmed')}
-            >
-              <CardContent>
-                <Typography color="textSecondary" gutterBottom>
-                  Unconfirmed Apps
-                </Typography>
-                <Typography variant="h4">{stats.unconfirmedApps || 0}</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Card 
-              sx={{ 
-                cursor: 'pointer',
-                transition: 'transform 0.2s, box-shadow 0.2s',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: 3
-                }
-              }}
-              onClick={() => navigate('/confirmed')}
-            >
-              <CardContent>
-                <Typography color="textSecondary" gutterBottom>
-                  Confirmed Apps
-                </Typography>
-                <Typography variant="h4">{stats.confirmedApps || 0}</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-
-        <Grid container spacing={3} sx={{ mt: 2 }}>
-          <Grid item xs={12} md={6}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Your Progress
-                </Typography>
-                <Box sx={{ mb: 2 }}>
-                  <Typography variant="body1">
-                    Level {stats.level || 1} • {stats.xp || 0} XP
-                  </Typography>
-                  <LinearProgress 
-                    variant="determinate" 
-                    value={calculateLevelProgress()} 
-                    sx={{ mt: 1 }}
-                  />
-                </Box>
-                <Typography variant="body1">
-                  Confirmation Streak: {stats.streak || 0}
-                </Typography>
-                <Typography variant="body1">
-                  Confirmed by You: {stats.personalConfirmedApps || 0}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Team Stats
-                </Typography>
-                <Typography variant="body1">
-                  Team Size: {stats.teamStats?.teamSize || 0}
-                </Typography>
-                <Typography variant="body1">
-                  Total Confirmed: {stats.teamStats?.totalConfirmed || 0}
-                </Typography>
-                <Typography variant="body1">
-                  Total Unconfirmed: {stats.teamStats?.totalUnconfirmed || 0}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-
-        {stats.achievements && stats.achievements.length > 0 && (
-          <Card sx={{ mt: 3 }}>
+        <Box sx={{ p: 3 }}>
+          {/* User Progress Section */}
+          <Card sx={{ 
+            mb: 3, 
+            background: 'linear-gradient(135deg, #6B7AFF 0%, #8B9AFF 100%)', 
+            color: 'white',
+            boxShadow: '0 4px 20px rgba(107, 122, 255, 0.2)'
+          }}>
             <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Achievements
-              </Typography>
-              <Grid container spacing={2}>
-                {stats.achievements.map((achievement: any) => (
-                  <Grid item xs={12} sm={6} md={4} key={achievement.id}>
-                    <Card variant="outlined">
-                      <CardContent>
-                        <Typography variant="subtitle1">
-                          {achievement.name}
-                        </Typography>
-                        <Typography variant="body2" color="textSecondary">
-                          Unlocked: {new Date(achievement.unlockedAt).toLocaleDateString()}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                ))}
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={12} md={6}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                    <Avatar 
+                      sx={{ 
+                        width: 64, 
+                        height: 64, 
+                        bgcolor: '#8B9AFF',
+                        border: '3px solid white',
+                        boxShadow: '0 4px 12px rgba(139, 154, 255, 0.3)'
+                      }}
+                    >
+                      {user?.name?.[0]?.toUpperCase()}
+                    </Avatar>
+                    <Box>
+                      <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+                        {user?.name}
+                      </Typography>
+                      <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                        Level {stats.level || 1} • {stats.xp || 0} XP
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Tooltip title="Current Streak">
+                      <Chip
+                        icon={<FireIcon sx={{ color: '#FF6B6B' }} />}
+                        label={`${stats.streak || 0} Confirmation Streak`}
+                        sx={{ 
+                          bgcolor: 'rgba(255,255,255,0.25)', 
+                          color: 'white',
+                          '& .MuiChip-label': { fontWeight: 600 }
+                        }}
+                      />
+                    </Tooltip>
+                    <Tooltip title="Total Confirmations">
+                      <Chip
+                        icon={<CheckCircleIcon sx={{ color: '#4CAF50' }} />}
+                        label={`${stats.personalConfirmedApps || 0} Confirmed by You`}
+                        sx={{ 
+                          bgcolor: 'rgba(255,255,255,0.25)', 
+                          color: 'white',
+                          '& .MuiChip-label': { fontWeight: 600 }
+                        }}
+                      />
+                    </Tooltip>
+                  </Box>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Box sx={{ mb: 1 }}>
+                    <Typography variant="body2" sx={{ mb: 0.5, opacity: 0.9 }}>
+                      Progress to Level {(stats.level || 1) + 1}
+                    </Typography>
+                    <LinearProgress 
+                      variant="determinate" 
+                      value={calculateLevelProgress()} 
+                      sx={{ 
+                        height: 10, 
+                        borderRadius: 5,
+                        bgcolor: 'rgba(255,255,255,0.25)',
+                        '& .MuiLinearProgress-bar': {
+                          bgcolor: 'white',
+                          boxShadow: '0 0 10px rgba(255,255,255,0.5)'
+                        }
+                      }} 
+                    />
+                    <Typography variant="caption" sx={{ mt: 0.5, display: 'block', opacity: 0.9 }}>
+                      {Math.round(calculateLevelProgress())}% Complete
+                    </Typography>
+                  </Box>
+                </Grid>
               </Grid>
             </CardContent>
           </Card>
-        )}
+
+          {/* Stats Cards */}
+          <Grid container spacing={3}>
+            <Grid item xs={12} sm={6} md={4}>
+              <Card 
+                sx={{ 
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: 3
+                  }
+                }}
+                onClick={() => navigate('/apps')}
+              >
+                <CardContent>
+                  <Typography color="textSecondary" gutterBottom>
+                    Total Apps
+                  </Typography>
+                  <Typography variant="h4">{stats.totalApps || 0}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <Card 
+                sx={{ 
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: 3
+                  }
+                }}
+                onClick={() => navigate('/unconfirmed')}
+              >
+                <CardContent>
+                  <Typography color="textSecondary" gutterBottom>
+                    Unconfirmed Apps
+                  </Typography>
+                  <Typography variant="h4">{stats.unconfirmedApps || 0}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <Card 
+                sx={{ 
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: 3
+                  }
+                }}
+                onClick={() => navigate('/confirmed')}
+              >
+                <CardContent>
+                  <Typography color="textSecondary" gutterBottom>
+                    Confirmed Apps
+                  </Typography>
+                  <Typography variant="h4">{stats.confirmedApps || 0}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+
+          {/* Team Stats */}
+          <Card sx={{ mt: 3, mb: 3 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <GroupsIcon color="primary" /> Team Stats
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={4}>
+                  <Box sx={{ textAlign: 'center', p: 2 }}>
+                    <Typography variant="h4" color="primary">
+                      {stats.teamStats?.teamSize || 0}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      Team Members
+                    </Typography>
+                  </Box>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Box sx={{ textAlign: 'center', p: 2 }}>
+                    <Typography variant="h4" color="success.main">
+                      {stats.teamStats?.totalConfirmed || 0}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      Total Confirmed
+                    </Typography>
+                  </Box>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Box sx={{ textAlign: 'center', p: 2 }}>
+                    <Typography variant="h4" color="warning.main">
+                      {stats.teamStats?.totalUnconfirmed || 0}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      Total Unconfirmed
+                    </Typography>
+                  </Box>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+
+          {/* Achievements Section */}
+          {stats.achievements && stats.achievements.length > 0 && (
+            <Card sx={{ mt: 3, mb: 3 }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <TrophyIcon color="primary" /> Achievements
+                </Typography>
+                <Grid container spacing={2}>
+                  {stats.achievements.map((achievement: any) => (
+                    <Grid item xs={12} sm={6} md={4} key={achievement.id}>
+                      <Card 
+                        sx={{ 
+                          bgcolor: 'success.light',
+                          color: 'white',
+                          transition: 'transform 0.2s',
+                          '&:hover': {
+                            transform: 'translateY(-4px)'
+                          }
+                        }}
+                      >
+                        <CardContent>
+                          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                            {achievement.name}
+                          </Typography>
+                          <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                            Unlocked: {new Date(achievement.unlockedAt).toLocaleDateString()}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
+              </CardContent>
+            </Card>
+          )}
+        </Box>
 
         {/* Leaderboard Card */}
         <Card sx={{ mt: 3 }}>
