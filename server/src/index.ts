@@ -35,10 +35,16 @@ app.use(express.json());
 app.use(morgan('dev'));
 app.use(helmet());
 
-// Test endpoint
+// Test endpoint - must be before any auth middleware
 app.get('/api/test', (req, res) => {
   console.log('Test endpoint hit');
-  res.json({ message: 'Server is running' });
+  res.status(200).json({ 
+    status: 'ok', 
+    message: 'Server is running',
+    timestamp: new Date().toISOString(),
+    env: process.env.NODE_ENV,
+    mongoStatus: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+  });
 });
 
 // Routes
@@ -58,30 +64,30 @@ const server = app.listen(PORT, () => {
 console.log('Attempting to connect to MongoDB...');
 if (!process.env.MONGODB_URI) {
   console.error('MONGODB_URI environment variable is not set!');
-  process.exit(1);
-}
+  // Don't exit, just log the error and continue
+} else {
+  const mongoUri = process.env.MONGODB_URI;
+  // Log connection attempt (hiding credentials)
+  console.log('Using MongoDB URI:', mongoUri.replace(/\/\/[^:]+:[^@]+@/, '//<credentials>@'));
 
-const mongoUri = process.env.MONGODB_URI;
-// Log connection attempt (hiding credentials)
-console.log('Using MongoDB URI:', mongoUri.replace(/\/\/[^:]+:[^@]+@/, '//<credentials>@'));
-
-mongoose.connect(mongoUri, {
-  serverSelectionTimeoutMS: 5000,
-  socketTimeoutMS: 45000,
-})
-  .then(() => {
-    console.log('Connected to MongoDB successfully');
+  mongoose.connect(mongoUri, {
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000,
   })
-  .catch((error) => {
-    console.error('MongoDB connection error:', error);
-    console.error('Connection details:', {
-      uri: mongoUri.replace(/\/\/[^:]+:[^@]+@/, '//<credentials>@'),
-      error: error.message,
-      code: error.code,
-      name: error.name
+    .then(() => {
+      console.log('Connected to MongoDB successfully');
+    })
+    .catch((error) => {
+      console.error('MongoDB connection error:', error);
+      console.error('Connection details:', {
+        uri: mongoUri.replace(/\/\/[^:]+:[^@]+@/, '//<credentials>@'),
+        error: error.message,
+        code: error.code,
+        name: error.name
+      });
+      // Don't exit the process, just log the error
     });
-    // Don't exit the process, just log the error
-  });
+}
 
 // Handle process termination
 process.on('SIGTERM', () => {
