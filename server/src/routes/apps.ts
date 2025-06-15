@@ -199,20 +199,25 @@ router.patch('/:id/confirm', async (req: express.Request, res: express.Response)
 
     console.log('Updated user stats:', {
       id: user._id,
-      name: user.name,
       xp: user.xp,
       level: user.level,
-      streak: user.streak,
-      dailyConfirmations: user.dailyConfirmations
+      streak: user.streak
     });
 
+    // Populate the app with cluster and user information before sending response
+    const populatedApp = await AppName.findById(app._id)
+      .populate('cluster', 'name')
+      .populate('confirmedBy', 'name');
+
     res.json({
-      app,
+      app: populatedApp,
+      cluster: populatedApp?.cluster,
       user: {
+        _id: user._id,
+        name: user.name,
         xp: user.xp,
         level: user.level,
-        streak: user.streak,
-        dailyConfirmations: user.dailyConfirmations
+        streak: user.streak
       }
     });
   } catch (error) {
@@ -289,20 +294,25 @@ router.post('/:id/confirm', async (req: express.Request, res: express.Response) 
 
     console.log('Updated user stats:', {
       id: user._id,
-      name: user.name,
       xp: user.xp,
       level: user.level,
-      streak: user.streak,
-      dailyConfirmations: user.dailyConfirmations
+      streak: user.streak
     });
 
+    // Populate the app with cluster and user information before sending response
+    const populatedApp = await AppName.findById(app._id)
+      .populate('cluster', 'name')
+      .populate('confirmedBy', 'name');
+
     res.json({
-      app,
+      app: populatedApp,
+      cluster: populatedApp?.cluster,
       user: {
+        _id: user._id,
+        name: user.name,
         xp: user.xp,
         level: user.level,
-        streak: user.streak,
-        dailyConfirmations: user.dailyConfirmations
+        streak: user.streak
       }
     });
   } catch (error) {

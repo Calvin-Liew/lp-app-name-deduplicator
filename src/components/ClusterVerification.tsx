@@ -97,8 +97,8 @@ const ClusterVerification: React.FC = () => {
 
   const fetchApps = async () => {
     try {
-      // Fetch both confirmed and unconfirmed apps
-      const response = await axios.get(`${config.apiUrl}/api/apps?confirmed=false`, {
+      // Fetch all apps in the cluster, both confirmed and unconfirmed
+      const response = await axios.get(`${config.apiUrl}/api/apps`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -141,7 +141,7 @@ const ClusterVerification: React.FC = () => {
       );
       const { cluster, user } = response.data;
       setSnackbarMsg(
-        `App confirmed in Cluster: ${cluster?.name || 'Unknown'}! +100 XP (Level ${user?.level})`
+        `App confirmed in Cluster: ${cluster?.name || 'Unknown'}! +50 XP (Level ${user?.level})`
       );
       setSnackbarOpen(true);
       fetchApps();
