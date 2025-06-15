@@ -17,15 +17,26 @@ import {
   Autocomplete,
   Chip,
   Popper,
+  Card,
+  CardContent,
 } from '@mui/material';
 import {
   MoreVert as MoreVertIcon,
   CheckCircle as CheckCircleIcon,
   Pending as PendingIcon,
+  Close as CloseIcon,
+  Edit as EditIcon,
+  Info as InfoIcon,
 } from '@mui/icons-material';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
+import { useUserStats } from '../contexts/UserStatsContext';
 import config from '../config';
+
+interface AppListProps {
+  type?: 'all' | 'confirmed' | 'unconfirmed';
+  confirmed?: boolean;
+}
 
 interface App {
   _id: string;
@@ -36,11 +47,17 @@ interface App {
     name: string;
     canonicalName: string;
     confirmationRatio: number;
-  };
+  } | null;
   confirmed: boolean;
-  confirmedBy?: string;
+  createdBy: {
+    name: string;
+  };
+  confirmedBy?: {
+    name: string;
+  };
   createdAt: string;
   updatedAt: string;
+  notes?: string;
 }
 
 interface Cluster {
@@ -50,44 +67,43 @@ interface Cluster {
   confirmationRatio: number;
 }
 
-interface AppListProps {
-  type: 'all' | 'confirmed' | 'unconfirmed';
-}
-
-const AppList: React.FC<AppListProps> = ({ type }) => {
+const AppList: React.FC<AppListProps> = ({ type = 'all', confirmed }) => {
   const [apps, setApps] = useState<App[]>([]);
   const [clusters, setClusters] = useState<Cluster[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedApp, setSelectedApp] = useState<App | null>(null);
   const [moveDialogOpen, setMoveDialogOpen] = useState(false);
   const [selectedCluster, setSelectedCluster] = useState<Cluster | null>(null);
-  const { token } = useAuth();
+  const { token, user } = useAuth();
+  const { refreshStats } = useUserStats();
 
   useEffect(() => {
     if (token) {
       fetchApps();
       fetchClusters();
     }
-  }, [type, token]);
+  }, [token, type, confirmed]);
 
   const fetchApps = async () => {
     try {
       let url = `${config.apiUrl}/api/apps`;
-      if (type === 'confirmed') {
-        url += '?confirmed=true';
+      if (type === 'confirmed' || confirmed) {
+        url = `${config.apiUrl}/api/apps/confirmed`;
       } else if (type === 'unconfirmed') {
-        url += '?confirmed=false';
+        url = `${config.apiUrl}/api/apps/unconfirmed`;
       }
-      console.log('Fetching apps with URL:', url);
+      
       const response = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-      console.log('Apps response:', response.data);
       setApps(response.data);
     } catch (error) {
       console.error('Error fetching apps:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -128,26 +144,37 @@ const AppList: React.FC<AppListProps> = ({ type }) => {
 
   const handleConfirmApp = async (appId: string) => {
     try {
-      await axios.patch(`${config.apiUrl}/api/apps/${appId}/confirm`, {}, {
-        headers: {
-          Authorization: `Bearer ${token}`
+      const response = await axios.patch(
+        `${config.apiUrl}/api/apps/${appId}/confirm`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
-      });
+      );
+      const { cluster, user } = response.data;
       fetchApps();
+      refreshStats();
     } catch (error) {
       console.error('Error confirming app:', error);
     }
   };
 
-  const filteredApps = apps.filter((app) =>
+  const filteredApps = apps.filter(app =>
     app.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (loading) {
+    return <Box sx={{ p: 3 }}><Typography>Loading...</Typography></Box>;
+  }
 
   return (
     <Box sx={{ p: 3 }}>
       <Paper sx={{ p: 2, mb: 2, bgcolor: 'background.paper' }}>
         <Typography variant="h6" gutterBottom color="text.primary">
-          {type === 'confirmed' ? 'Confirmed Apps' : type === 'unconfirmed' ? 'Unconfirmed Apps' : 'All Apps'}
+          {type === 'confirmed' || confirmed ? 'Confirmed Apps' : 
+           type === 'unconfirmed' ? 'Unconfirmed Apps' : 'All Apps'}
         </Typography>
         <TextField
           fullWidth
@@ -159,59 +186,45 @@ const AppList: React.FC<AppListProps> = ({ type }) => {
         />
         <List>
           {filteredApps.map((app) => (
-            <ListItem
-              key={app._id}
-              sx={{
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 1,
-                mb: 1,
-                bgcolor: 'background.paper',
-                '&:hover': {
-                  backgroundColor: 'action.hover',
-                },
-              }}
-            >
-              <ListItemText
-                primary={<Typography color="text.primary">{app.name}</Typography>}
-                secondary={
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Chip
-                      label={app.cluster?.name || 'No Cluster'}
-                      size="small"
-                      color={app.cluster ? 'primary' : 'default'}
-                    />
-                    {app.confirmed ? (
-                      <CheckCircleIcon color="success" fontSize="small" />
-                    ) : (
-                      <PendingIcon color="warning" fontSize="small" />
+            <Card key={app._id} sx={{ mb: 2 }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Box>
+                    <Typography variant="h6">{app.name}</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Cluster: {app.cluster?.name || 'Unassigned'}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Added by: {app.createdBy?.name} on {new Date(app.createdAt).toLocaleDateString()}
+                    </Typography>
+                    {app.confirmedBy && (
+                      <Typography variant="body2" color="success.main">
+                        Confirmed by: {app.confirmedBy.name}
+                      </Typography>
                     )}
                   </Box>
-                }
-              />
-              {!app.confirmed && (
-                <ListItemSecondaryAction>
-                  <IconButton
-                    edge="end"
-                    onClick={() => handleConfirmApp(app._id)}
-                    sx={{ mr: 1 }}
-                  >
-                    <CheckCircleIcon color="primary" />
-                  </IconButton>
-                </ListItemSecondaryAction>
-              )}
-              <ListItemSecondaryAction>
-                <IconButton
-                  edge="end"
-                  onClick={() => {
-                    setSelectedApp(app);
-                    setMoveDialogOpen(true);
-                  }}
-                >
-                  <MoreVertIcon />
-                </IconButton>
-              </ListItemSecondaryAction>
-            </ListItem>
+                  <Box>
+                    {!app.confirmed && (
+                      <IconButton
+                        color="primary"
+                        onClick={() => handleConfirmApp(app._id)}
+                        title="Confirm App"
+                      >
+                        <CheckCircleIcon />
+                      </IconButton>
+                    )}
+                    {app.confirmed && (
+                      <Chip
+                        icon={<CheckCircleIcon />}
+                        label="Confirmed"
+                        color="success"
+                        sx={{ ml: 1 }}
+                      />
+                    )}
+                  </Box>
+                </Box>
+              </CardContent>
+            </Card>
           ))}
         </List>
       </Paper>

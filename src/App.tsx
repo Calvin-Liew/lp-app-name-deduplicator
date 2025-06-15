@@ -175,13 +175,7 @@ const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return <>{children}</>;
 };
 
-const App: React.FC = () => {
-  const [mode, setMode] = useState<'light' | 'dark'>(
-    window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-  );
-  const theme = useMemo(() => theme, []);
-  const toggleDarkMode = () => setMode((prev) => (prev === 'light' ? 'dark' : 'light'));
-
+function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -211,7 +205,7 @@ const App: React.FC = () => {
                 path="/confirmed"
                 element={
                   <PrivateRoute>
-                    <AppList confirmed={true} />
+                    <AppList type="confirmed" />
                   </PrivateRoute>
                 }
               />
@@ -219,7 +213,7 @@ const App: React.FC = () => {
                 path="/apps"
                 element={
                   <PrivateRoute>
-                    <AppList />
+                    <AppList type="all" />
                   </PrivateRoute>
                 }
               />
@@ -230,6 +224,6 @@ const App: React.FC = () => {
       </AuthProvider>
     </ThemeProvider>
   );
-};
+}
 
 export default App; 
