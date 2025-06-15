@@ -9,4 +9,6 @@ healthcheckTimeout = 300
 
 [env]
 MONGODB_URI = "${{shared.MONGODB_URI}}"
-PORT = "8080" 
+JWT_SECRET = "${{shared.JWT_SECRET}}"
+NODE_ENV = "${{shared.NODE_ENV}}"
+PORT = "${{shared.PORT}}" 

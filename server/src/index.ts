@@ -26,6 +26,14 @@ console.log('MongoDB URI:', process.env.MONGODB_URI ? 'Set' : 'Not set');
 console.log('Railway Project:', process.env.RAILWAY_PROJECT_NAME);
 console.log('Railway Service:', process.env.RAILWAY_SERVICE_NAME);
 
+// Debug all environment variables (excluding sensitive data)
+console.log('Available environment variables:', Object.keys(process.env).filter(key => 
+  !key.toLowerCase().includes('key') && 
+  !key.toLowerCase().includes('secret') && 
+  !key.toLowerCase().includes('password') &&
+  !key.toLowerCase().includes('uri')
+));
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
