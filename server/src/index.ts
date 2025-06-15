@@ -17,13 +17,15 @@ import { Request } from 'express';
 // Load environment variables
 dotenv.config();
 
+// Debug logging
+console.log('Environment:', process.env.NODE_ENV);
+console.log('Port:', process.env.PORT);
+console.log('MongoDB URI:', process.env.MONGODB_URI ? 'Set' : 'Not set');
+console.log('Railway Project:', process.env.RAILWAY_PROJECT_NAME);
+console.log('Railway Service:', process.env.RAILWAY_SERVICE_NAME);
+
 const app = express();
 const PORT = process.env.PORT || 3001;
-
-// Log environment variables (without sensitive data)
-console.log('Environment:', process.env.NODE_ENV);
-console.log('Port:', PORT);
-console.log('MongoDB URI:', process.env.MONGODB_URI ? 'Set' : 'Not set');
 
 // Middleware
 app.use(cors());
@@ -54,7 +56,14 @@ const server = app.listen(PORT, () => {
 });
 
 // Then connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/app-deduplicator')
+console.log('Attempting to connect to MongoDB...');
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/app-deduplicator';
+console.log('Using MongoDB URI:', mongoUri.replace(/\/\/[^:]+:[^@]+@/, '//<credentials>@')); // Hide credentials in logs
+
+mongoose.connect(mongoUri, {
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+})
   .then(() => {
     console.log('Connected to MongoDB');
   })
