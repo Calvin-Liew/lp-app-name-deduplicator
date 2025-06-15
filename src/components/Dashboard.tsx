@@ -43,6 +43,7 @@ import {
   Groups as GroupsIcon,
   Speed as SpeedIcon,
   Timeline as TimelineIcon,
+  Whatshot as FireIconAlt,
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
@@ -144,9 +145,11 @@ const Dashboard: React.FC = () => {
   ];
 
   const calculateLevelProgress = () => {
-    if (!stats.level || !stats.xp) return 0;
-    const xpForNextLevel = stats.level * 1000;
-    return Math.min((stats.xp / xpForNextLevel) * 100, 100);
+    const currentLevel = stats.level || 1;
+    const xpForNextLevel = currentLevel * 100;
+    const currentXp = stats.xp || 0;
+    const xpInCurrentLevel = currentXp % 100;
+    return (xpInCurrentLevel / 100) * 100;
   };
 
   return (
@@ -208,7 +211,7 @@ const Dashboard: React.FC = () => {
           Dashboard
         </Typography>
 
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ p: 3, bgcolor: 'background.default' }}>
           {/* User Progress Section */}
           <Card sx={{ 
             mb: 3, 
@@ -243,7 +246,7 @@ const Dashboard: React.FC = () => {
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Tooltip title="Current Streak">
                       <Chip
-                        icon={<FireIcon sx={{ color: '#FF6B6B' }} />}
+                        icon={<FireIconAlt sx={{ color: '#FF6B00' }} />}
                         label={`${stats.streak || 0} Confirmation Streak`}
                         sx={{ 
                           bgcolor: 'rgba(255,255,255,0.25)', 
@@ -254,7 +257,7 @@ const Dashboard: React.FC = () => {
                     </Tooltip>
                     <Tooltip title="Total Confirmations">
                       <Chip
-                        icon={<CheckCircleIcon sx={{ color: '#4CAF50' }} />}
+                        icon={<CheckCircleIcon sx={{ color: '#00C853' }} />}
                         label={`${stats.personalConfirmedApps || 0} Confirmed by You`}
                         sx={{ 
                           bgcolor: 'rgba(255,255,255,0.25)', 

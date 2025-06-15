@@ -52,7 +52,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Login from './components/Login';
@@ -64,6 +64,9 @@ import AdminUpload from './components/AdminUpload';
 import ClusterVerification from './components/ClusterVerification';
 import Layout from './components/Layout';
 import { UserStatsProvider } from './contexts/UserStatsContext';
+import PrivateRoute from './components/PrivateRoute';
+import Navbar from './components/Navbar';
+import theme from './theme';
 
 interface AppCluster {
   canonicalName: string;
@@ -150,49 +153,6 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   justifyContent: 'flex-end',
 }));
 
-const getTheme = (mode: 'light' | 'dark') => createTheme({
-  palette: {
-    mode,
-    primary: {
-      main: '#444492',
-    },
-    secondary: {
-      main: '#f50057',
-    },
-    background: {
-      default: mode === 'dark' ? '#181a20' : '#f5f5f5',
-      paper: mode === 'dark' ? '#23272f' : '#fff',
-    },
-  },
-  shape: {
-    borderRadius: 16,
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-          textTransform: 'none',
-          fontWeight: 600,
-        },
-      },
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          borderRadius: 16,
-          boxShadow: '0 4px 24px rgba(68,68,146,0.10)',
-        },
-      },
-    },
-  },
-});
-
-const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user } = useAuth();
-  return user ? <>{children}</> : <Navigate to="/login" />;
-};
-
 const allowedAdminEmails = ['calvin.liew@sanofi.com', 'yuyou.wu@sanofi.com'];
 
 const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -219,7 +179,7 @@ const App: React.FC = () => {
   const [mode, setMode] = useState<'light' | 'dark'>(
     window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   );
-  const theme = useMemo(() => getTheme(mode), [mode]);
+  const theme = useMemo(() => theme, []);
   const toggleDarkMode = () => setMode((prev) => (prev === 'light' ? 'dark' : 'light'));
 
   return (
@@ -228,24 +188,42 @@ const App: React.FC = () => {
       <AuthProvider>
         <UserStatsProvider>
           <Router>
+            <Navbar />
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route
-                path="*"
+                path="/"
                 element={
                   <PrivateRoute>
-                    <Layout mode={mode} toggleDarkMode={toggleDarkMode}>
-                      <Routes>
-                        <Route path="/" element={<Dashboard />} />
-                        <Route path="/apps" element={<AppList type="all" />} />
-                        <Route path="/unconfirmed" element={<ClusterVerification />} />
-                        <Route path="/confirmed" element={<AppList type="confirmed" />} />
-                        <Route path="/admin/upload" element={<AdminRoute><AdminUpload /></AdminRoute>} />
-                      </Routes>
-                    </Layout>
+                    <Dashboard />
                   </PrivateRoute>
                 }
               />
+              <Route
+                path="/unconfirmed"
+                element={
+                  <PrivateRoute>
+                    <ClusterVerification />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/confirmed"
+                element={
+                  <PrivateRoute>
+                    <AppList confirmed={true} />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/apps"
+                element={
+                  <PrivateRoute>
+                    <AppList />
+                  </PrivateRoute>
+                }
+              />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Router>
         </UserStatsProvider>
