@@ -100,7 +100,18 @@ router.post(
 // Get current user
 router.get('/me', auth, async (req: express.Request, res: express.Response) => {
   try {
-    res.json((req as any).user);
+    const user = (req as any).user;
+    // Ensure admin role for specific emails
+    if (user.email === 'calvin.liew@sanofi.com' || user.email === 'yuyou.wu@sanofi.com') {
+      user.role = 'admin';
+      await user.save();
+    }
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role
+    });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
   }

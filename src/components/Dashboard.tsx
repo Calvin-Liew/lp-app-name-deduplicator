@@ -245,22 +245,26 @@ const Dashboard: React.FC = () => {
                   </Box>
                   <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
                     <Chip
-                      icon={<FireIcon sx={{ color: '#FF6B00', fontSize: 20 }} />}
+                      icon={<FireIcon sx={{ color: 'white', fontSize: 20 }} />}
                       label={`${stats.streak} Day Streak`}
                       sx={{
-                        bgcolor: 'rgba(255, 107, 0, 0.08)',
+                        bgcolor: '#FF6B00',
+                        color: 'white',
+                        '& .MuiChip-label': { fontWeight: 600 },
                         '&:hover': {
-                          bgcolor: 'rgba(255, 107, 0, 0.12)',
+                          bgcolor: '#E65C00',
                         },
                       }}
                     />
                     <Chip
-                      icon={<CheckCircleIcon sx={{ color: '#00C853', fontSize: 20 }} />}
+                      icon={<CheckCircleIcon sx={{ color: 'white', fontSize: 20 }} />}
                       label={`${stats.personalConfirmedApps} Confirmed by You`}
                       sx={{
-                        bgcolor: 'rgba(0, 200, 83, 0.08)',
+                        bgcolor: '#00C853',
+                        color: 'white',
+                        '& .MuiChip-label': { fontWeight: 600 },
                         '&:hover': {
-                          bgcolor: 'rgba(0, 200, 83, 0.12)',
+                          bgcolor: '#00B248',
                         },
                       }}
                     />
