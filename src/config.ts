@@ -1,5 +1,5 @@
 const config = {
-  apiUrl: process.env.REACT_APP_API_URL || 'https://web-production-2f14c.up.railway.app'
+  apiUrl: process.env.REACT_APP_API_URL || `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
 };
 
 export default config; 

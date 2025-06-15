@@ -11,4 +11,5 @@ healthcheckTimeout = 300
 MONGODB_URI = "${{shared.MONGODB_URI}}"
 JWT_SECRET = "${{shared.JWT_SECRET}}"
 NODE_ENV = "${{shared.NODE_ENV}}"
-PORT = "${{shared.PORT}}" 
+PORT = "${{shared.PORT}}"
+REACT_APP_API_URL = "https://${{RAILWAY_PUBLIC_DOMAIN}}" 
