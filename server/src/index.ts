@@ -9,6 +9,7 @@ import userRoutes from './routes/users';
 import appRoutes from './routes/apps';
 import clusterRoutes from './routes/clusters';
 import adminRoutes from './routes/admin';
+import leaderboardRoutes from './routes/leaderboard';
 import { AppName } from './models/AppName';
 import { Cluster } from './models/Cluster';
 import { User } from './models/User';
@@ -60,6 +61,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/apps', auth, appRoutes);
 app.use('/api/clusters', auth, clusterRoutes);
 app.use('/api/admin', auth, adminRoutes);
+app.use('/api/leaderboard', auth, leaderboardRoutes);
 
 // Start server first
 console.log('Starting server...');
