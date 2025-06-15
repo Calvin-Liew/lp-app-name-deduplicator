@@ -10,9 +10,15 @@ const router = express.Router();
 router.get('/', async (req: express.Request, res: express.Response) => {
   try {
     const { confirmed } = req.query;
-    console.log('Fetching apps with query:', { confirmed });
+    console.log('Raw confirmed query:', confirmed);
     
-    const query = confirmed !== undefined ? { confirmed: confirmed === 'true' } : {};
+    let query: any = {};
+    if (confirmed !== undefined && confirmed !== 'undefined') {
+      query.confirmed = confirmed === 'true';
+    }
+    
+    console.log('Fetching apps with query:', query);
+    
     const apps = await AppName.find(query)
       .populate('cluster', 'name')
       .populate('createdBy', 'name')

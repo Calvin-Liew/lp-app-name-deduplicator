@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import axios from 'axios';
+import config from '../config';
 
 export interface Achievement {
   id: string;
@@ -59,13 +60,14 @@ export const UserStatsProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`/api/stats?ts=${Date.now()}`, {
+      const response = await axios.get(`${config.apiUrl}/api/users/stats`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Cache-Control': 'no-cache',
           Pragma: 'no-cache',
         },
       });
+      console.log('Stats response:', response.data);
       setStats({
         xp: response.data.xp || 0,
         level: response.data.level || 1,
@@ -78,8 +80,8 @@ export const UserStatsProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         achievements: response.data.achievements || [],
         personalConfirmedApps: response.data.personalConfirmedApps || 0,
       });
-    } catch (e) {
-      // Optionally handle error
+    } catch (error) {
+      console.error('Error fetching stats:', error);
     } finally {
       setLoading(false);
     }

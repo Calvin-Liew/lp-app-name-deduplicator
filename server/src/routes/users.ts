@@ -177,4 +177,59 @@ router.get('/test-stats', auth, async (req: express.Request, res: express.Respon
   }
 });
 
+// Get user stats
+router.get('/stats', auth, async (req: express.Request, res: express.Response) => {
+  try {
+    const user = (req as any).user;
+    console.log('Fetching stats for user:', user._id);
+
+    // Get total apps count
+    const totalApps = await AppName.countDocuments();
+    console.log('Total apps:', totalApps);
+
+    // Get unconfirmed apps count
+    const unconfirmedApps = await AppName.countDocuments({ confirmed: false });
+    console.log('Unconfirmed apps:', unconfirmedApps);
+
+    // Get confirmed apps count
+    const confirmedApps = await AppName.countDocuments({ confirmed: true });
+    console.log('Confirmed apps:', confirmedApps);
+
+    // Get user's confirmed apps count
+    const personalConfirmedApps = await AppName.countDocuments({ confirmedBy: user._id });
+    console.log('Personal confirmed apps:', personalConfirmedApps);
+
+    // Get user's streak
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const streakApps = await AppName.countDocuments({
+      confirmedBy: user._id,
+      updatedAt: { $gte: today }
+    });
+    console.log('Today\'s confirmations:', streakApps);
+
+    // Get user's achievements
+    const achievements = user.achievements || [];
+
+    res.json({
+      xp: user.xp || 0,
+      level: user.level || 1,
+      streak: user.streak || 0,
+      confirmedApps: confirmedApps,
+      totalApps: totalApps,
+      unconfirmedApps: unconfirmedApps,
+      personalConfirmedApps: personalConfirmedApps,
+      achievements: achievements,
+      teamStats: {
+        totalConfirmed: confirmedApps,
+        totalUnconfirmed: unconfirmedApps,
+        teamSize: await User.countDocuments()
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching stats:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 export default router; 

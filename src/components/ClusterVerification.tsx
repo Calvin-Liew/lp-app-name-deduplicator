@@ -98,7 +98,7 @@ const ClusterVerification: React.FC = () => {
   const fetchApps = async () => {
     try {
       // Fetch both confirmed and unconfirmed apps
-      const response = await axios.get(`${config.apiUrl}/api/apps`, {
+      const response = await axios.get(`${config.apiUrl}/api/apps?confirmed=false`, {
         headers: {
           Authorization: `Bearer ${token}`
         }

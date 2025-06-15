@@ -78,7 +78,7 @@ const AppList: React.FC<AppListProps> = ({ type }) => {
       } else if (type === 'unconfirmed') {
         url += '?confirmed=false';
       }
-      console.log('Fetching apps with token:', token);
+      console.log('Fetching apps with URL:', url);
       const response = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${token}`

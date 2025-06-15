@@ -204,173 +204,10 @@ const Dashboard: React.FC = () => {
           minHeight: '100vh',
         }}
       >
-        {/* User Progress Section */}
-        <Card sx={{ 
-          mb: 3, 
-          background: 'linear-gradient(135deg, #6B7AFF 0%, #8B9AFF 100%)', 
-          color: 'white',
-          boxShadow: '0 4px 20px rgba(107, 122, 255, 0.2)'
-        }}>
-          <CardContent>
-            <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} md={6}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                  <Avatar 
-                    sx={{ 
-                      width: 64, 
-                      height: 64, 
-                      bgcolor: '#8B9AFF',
-                      border: '3px solid white',
-                      boxShadow: '0 4px 12px rgba(139, 154, 255, 0.3)'
-                    }}
-                  >
-                    {user?.name?.[0]?.toUpperCase()}
-                  </Avatar>
-                  <Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-                        {user?.name}
-                      </Typography>
-                      {(() => {
-                        const userIdx = leaderboard.findIndex(l => l.userId === user?._id);
-                        let rankStyle = {};
-                        let rankIcon = null;
-                        if (userIdx === 0) {
-                          rankStyle = { color: '#FFD700', fontWeight: 'bold', fontSize: 32 };
-                          rankIcon = '🥇';
-                        } else if (userIdx === 1) {
-                          rankStyle = { color: '#C0C0C0', fontWeight: 'bold', fontSize: 28 };
-                          rankIcon = '🥈';
-                        } else if (userIdx === 2) {
-                          rankStyle = { color: '#CD7F32', fontWeight: 'bold', fontSize: 24 };
-                          rankIcon = '🥉';
-                        } else if (userIdx > 2) {
-                          rankStyle = { color: '#888', fontWeight: 'bold', fontSize: 20 };
-                        }
-                        return userIdx !== -1 ? (
-                          <span style={rankStyle}>{rankIcon || userIdx + 1}</span>
-                        ) : (
-                          <span style={{ color: '#bbb', fontWeight: 'bold', fontSize: 18 }}>N/A</span>
-                        );
-                      })()}
-                    </Box>
-                    <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                      Level {stats.level || 1} • {stats.xp || 0} XP
-                    </Typography>
-                  </Box>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <Tooltip title="Current Streak">
-                    <Chip
-                      icon={
-                        <Box sx={{ 
-                          display: 'flex', 
-                          alignItems: 'center',
-                          color: '#FF6B6B',
-                          animation: 'pulse 2s infinite',
-                          '@keyframes pulse': {
-                            '0%': {
-                              transform: 'scale(1)',
-                              opacity: 1,
-                            },
-                            '50%': {
-                              transform: 'scale(1.2)',
-                              opacity: 0.8,
-                            },
-                            '100%': {
-                              transform: 'scale(1)',
-                              opacity: 1,
-                            },
-                          },
-                        }}>
-                          <FireIcon sx={{ fontSize: 20 }} />
-                        </Box>
-                      }
-                      label={`${stats.streak || 0} Confirmation Streak`}
-                      sx={{ 
-                        bgcolor: 'rgba(255,255,255,0.25)', 
-                        color: 'white',
-                        '& .MuiChip-label': {
-                          fontWeight: 600,
-                        },
-                        '&:hover': {
-                          bgcolor: 'rgba(255,255,255,0.35)',
-                        },
-                        '& .MuiChip-icon': {
-                          color: '#FF6B6B !important',
-                        },
-                      }}
-                    />
-                  </Tooltip>
-                  <Tooltip title="Total Confirmations">
-                    <Chip
-                      icon={
-                        <Box sx={{ 
-                          display: 'flex', 
-                          alignItems: 'center',
-                          color: '#4CAF50',
-                          animation: 'glow 2s infinite',
-                          '@keyframes glow': {
-                            '0%': {
-                              filter: 'drop-shadow(0 0 2px rgba(76, 175, 80, 0.4))',
-                            },
-                            '50%': {
-                              filter: 'drop-shadow(0 0 8px rgba(76, 175, 80, 0.6))',
-                            },
-                            '100%': {
-                              filter: 'drop-shadow(0 0 2px rgba(76, 175, 80, 0.4))',
-                            },
-                          },
-                        }}>
-                          <CheckCircleIcon sx={{ fontSize: 20 }} />
-                        </Box>
-                      }
-                      label={`${stats.personalConfirmedApps || 0} Confirmed by You`}
-                      sx={{ 
-                        bgcolor: 'rgba(255,255,255,0.25)', 
-                        color: 'white',
-                        '& .MuiChip-label': {
-                          fontWeight: 600,
-                        },
-                        '&:hover': {
-                          bgcolor: 'rgba(255,255,255,0.35)',
-                        },
-                        '& .MuiChip-icon': {
-                          color: '#4CAF50 !important',
-                        },
-                      }}
-                    />
-                  </Tooltip>
-                </Box>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <Box sx={{ mb: 1 }}>
-                  <Typography variant="body2" sx={{ mb: 0.5, opacity: 0.9 }}>
-                    Progress to Level {(stats.level || 1) + 1}
-                  </Typography>
-                  <LinearProgress 
-                    variant="determinate" 
-                    value={calculateLevelProgress()} 
-                    sx={{ 
-                      height: 10, 
-                      borderRadius: 5,
-                      bgcolor: 'rgba(255,255,255,0.25)',
-                      '& .MuiLinearProgress-bar': {
-                        bgcolor: 'white',
-                        boxShadow: '0 0 10px rgba(255,255,255,0.5)'
-                      }
-                    }} 
-                  />
-                  <Typography variant="caption" sx={{ mt: 0.5, display: 'block', opacity: 0.9 }}>
-                    {Math.round(calculateLevelProgress())}% Complete
-                  </Typography>
-                </Box>
-              </Grid>
-            </Grid>
-          </CardContent>
-        </Card>
+        <Typography variant="h4" gutterBottom>
+          Dashboard
+        </Typography>
 
-        {/* Stats Cards */}
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={4}>
             <Card 
@@ -388,7 +225,7 @@ const Dashboard: React.FC = () => {
                 <Typography color="textSecondary" gutterBottom>
                   Total Apps
                 </Typography>
-                <Typography variant="h4">{stats.totalApps}</Typography>
+                <Typography variant="h4">{stats.totalApps || 0}</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -408,7 +245,7 @@ const Dashboard: React.FC = () => {
                 <Typography color="textSecondary" gutterBottom>
                   Unconfirmed Apps
                 </Typography>
-                <Typography variant="h4">{stats.unconfirmedApps}</Typography>
+                <Typography variant="h4">{stats.unconfirmedApps || 0}</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -428,57 +265,83 @@ const Dashboard: React.FC = () => {
                 <Typography color="textSecondary" gutterBottom>
                   Confirmed Apps
                 </Typography>
-                <Typography variant="h4">{stats.confirmedApps}</Typography>
+                <Typography variant="h4">{stats.confirmedApps || 0}</Typography>
               </CardContent>
             </Card>
           </Grid>
         </Grid>
 
-        {/* Achievements Section */}
-        <Card sx={{ mt: 3, mb: 3 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom color="text.primary" sx={{ fontWeight: 700 }}>
-              Achievements
-            </Typography>
-            <Grid container spacing={2}>
-              {stats.achievements?.map((achievement: Achievement) => (
-                <Grid item xs={12} sm={6} md={4} key={achievement.id}>
-                  <Card 
-                    sx={{ 
-                      bgcolor: achievement.unlocked ? 'success.light' : 'background.paper',
-                      opacity: achievement.unlocked ? 1 : 0.7,
-                      transition: 'all 0.3s ease'
-                    }}
-                  >
-                    <CardContent>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Avatar sx={{ bgcolor: achievement.unlocked ? 'success.main' : 'grey.500' }}>
-                          {achievement.icon}
-                        </Avatar>
-                        <Box sx={{ flex: 1 }}>
-                          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                            {achievement.name}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {achievement.description}
-                          </Typography>
-                          <LinearProgress 
-                            variant="determinate" 
-                            value={(achievement.progress / achievement.total) * 100}
-                            sx={{ mt: 1 }}
-                          />
-                          <Typography variant="caption" color="text.secondary">
-                            {achievement.progress}/{achievement.total}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </CardContent>
-        </Card>
+        <Grid container spacing={3} sx={{ mt: 2 }}>
+          <Grid item xs={12} md={6}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Your Progress
+                </Typography>
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="body1">
+                    Level {stats.level || 1} • {stats.xp || 0} XP
+                  </Typography>
+                  <LinearProgress 
+                    variant="determinate" 
+                    value={calculateLevelProgress()} 
+                    sx={{ mt: 1 }}
+                  />
+                </Box>
+                <Typography variant="body1">
+                  Confirmation Streak: {stats.streak || 0}
+                </Typography>
+                <Typography variant="body1">
+                  Confirmed by You: {stats.personalConfirmedApps || 0}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Team Stats
+                </Typography>
+                <Typography variant="body1">
+                  Team Size: {stats.teamStats?.teamSize || 0}
+                </Typography>
+                <Typography variant="body1">
+                  Total Confirmed: {stats.teamStats?.totalConfirmed || 0}
+                </Typography>
+                <Typography variant="body1">
+                  Total Unconfirmed: {stats.teamStats?.totalUnconfirmed || 0}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+
+        {stats.achievements && stats.achievements.length > 0 && (
+          <Card sx={{ mt: 3 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Achievements
+              </Typography>
+              <Grid container spacing={2}>
+                {stats.achievements.map((achievement: any) => (
+                  <Grid item xs={12} sm={6} md={4} key={achievement.id}>
+                    <Card variant="outlined">
+                      <CardContent>
+                        <Typography variant="subtitle1">
+                          {achievement.name}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          Unlocked: {new Date(achievement.unlockedAt).toLocaleDateString()}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Leaderboard Card */}
         <Card sx={{ mt: 3 }}>
