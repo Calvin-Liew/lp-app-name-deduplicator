@@ -81,6 +81,7 @@ const ClusterVerification: React.FC = () => {
   const [moveDialogOpen, setMoveDialogOpen] = useState(false);
   const [moveTargetApp, setMoveTargetApp] = useState<App | null>(null);
   const [moveTargetClusterId, setMoveTargetClusterId] = useState<string>('');
+  const [selectedApps, setSelectedApps] = useState<Set<string>>(new Set());
   const { token, user } = useAuth();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMsg, setSnackbarMsg] = useState('');
@@ -232,6 +233,63 @@ const ClusterVerification: React.FC = () => {
     }
   };
 
+  const handleSelectApp = (appId: string) => {
+    setSelectedApps(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(appId)) {
+        newSet.delete(appId);
+      } else {
+        newSet.add(appId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSelectAllInCluster = (clusterId: string) => {
+    const clusterApps = apps.filter(app => app.cluster?._id === clusterId && !app.confirmed);
+    const allSelected = clusterApps.every(app => selectedApps.has(app._id));
+    
+    setSelectedApps(prev => {
+      const newSet = new Set(prev);
+      clusterApps.forEach(app => {
+        if (allSelected) {
+          newSet.delete(app._id);
+        } else {
+          newSet.add(app._id);
+        }
+      });
+      return newSet;
+    });
+  };
+
+  const handleBulkConfirm = async () => {
+    try {
+      const confirmPromises = Array.from(selectedApps).map(appId =>
+        axios.patch(
+          `${config.apiUrl}/api/apps/${appId}/confirm`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        )
+      );
+
+      await Promise.all(confirmPromises);
+      setSnackbarMsg(`Successfully confirmed ${selectedApps.size} apps!`);
+      setSnackbarOpen(true);
+      setSelectedApps(new Set());
+      fetchApps();
+      fetchClusters();
+      refreshStats();
+    } catch (error) {
+      console.error('Error confirming apps:', error);
+      setSnackbarMsg('Error confirming apps');
+      setSnackbarOpen(true);
+    }
+  };
+
   const filteredApps = apps.filter(app => {
     const matchesSearch = app.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCluster = !selectedCluster || app.cluster?._id === selectedCluster._id;
@@ -301,6 +359,19 @@ const ClusterVerification: React.FC = () => {
         </Grid>
       </Grid>
 
+      {selectedApps.size > 0 && (
+        <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleBulkConfirm}
+            startIcon={<CheckCircleIcon />}
+          >
+            Confirm Selected ({selectedApps.size})
+          </Button>
+        </Box>
+      )}
+
       {Object.entries(appsByCluster).map(([clusterId, clusterApps]) => {
         let cluster = clusters.find(c => c && c._id === clusterId);
         if (!cluster) {
@@ -316,23 +387,34 @@ const ClusterVerification: React.FC = () => {
         return (
           <Card key={clusterId} sx={{ mb: 3, bgcolor: 'background.paper' }}>
             <CardContent>
-              <Typography variant="h6" gutterBottom color="text.primary">
-                {displayName}
-                {displayCanonical && (
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h6" color="text.primary">
+                  {displayName}
+                  {displayCanonical && (
+                    <Chip
+                      label={`Canonical: ${displayCanonical}`}
+                      size="small"
+                      color="primary"
+                      sx={{ ml: 2 }}
+                    />
+                  )}
                   <Chip
-                    label={`Canonical: ${displayCanonical}`}
+                    label={`${(cluster.confirmationRatio * 100).toFixed(0)}% Confirmed`}
                     size="small"
-                    color="primary"
+                    color="secondary"
                     sx={{ ml: 2 }}
                   />
+                </Typography>
+                {unconfirmedApps.length > 0 && (
+                  <Button
+                    size="small"
+                    onClick={() => handleSelectAllInCluster(clusterId)}
+                    sx={{ ml: 'auto' }}
+                  >
+                    {unconfirmedApps.every(app => selectedApps.has(app._id)) ? 'Deselect All' : 'Select All'}
+                  </Button>
                 )}
-                <Chip
-                  label={`${(cluster.confirmationRatio * 100).toFixed(0)}% Confirmed`}
-                  size="small"
-                  color="secondary"
-                  sx={{ ml: 2 }}
-                />
-              </Typography>
+              </Box>
               <List>
                 {confirmedApps.length > 0 && (
                   <>
@@ -457,6 +539,11 @@ const ClusterVerification: React.FC = () => {
                           },
                         }}
                       >
+                        <Checkbox
+                          checked={selectedApps.has(app._id)}
+                          onChange={() => handleSelectApp(app._id)}
+                          sx={{ mr: 1 }}
+                        />
                         <Box sx={{ flex: 1 }}>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             <Typography variant="subtitle1" component="span" color="text.primary">{app.name}</Typography>
