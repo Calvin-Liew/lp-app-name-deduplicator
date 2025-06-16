@@ -72,15 +72,44 @@ const AdminUpload: React.FC = () => {
         }
       });
       const data = response.data;
-      // Format for Excel: [{ Cluster: '...', 'App Names': 'a (Confirmed), b (Unconfirmed), c (Confirmed)' }, ...]
-      const rows = data.map((row: { cluster: string; apps: { name: string; confirmed: boolean }[] }) => ({
-        'Cluster': row.cluster,
-        'App Names': row.apps.map(app => `${app.name} (${app.confirmed ? 'Confirmed' : 'Unconfirmed'})`).join(', ')
-      }));
-      const worksheet = XLSX.utils.json_to_sheet(rows);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Clusters');
-      XLSX.writeFile(workbook, 'clusters_export.xlsx');
+      
+      // Convert data to CSV format
+      const csvRows = [];
+      
+      // Add header row
+      csvRows.push(['Cluster', 'App Name', 'Status']);
+      
+      // Add data rows
+      data.forEach((row: { cluster: string; apps: { name: string; confirmed: boolean }[] }) => {
+        row.apps.forEach(app => {
+          csvRows.push([
+            row.cluster,
+            app.name,
+            app.confirmed ? 'Confirmed' : 'Unconfirmed'
+          ]);
+        });
+      });
+      
+      // Convert to CSV string
+      const csvContent = csvRows.map(row => row.map(cell => {
+        // Escape quotes and wrap in quotes if contains comma or quote
+        const cellStr = String(cell);
+        if (cellStr.includes(',') || cellStr.includes('"')) {
+          return `"${cellStr.replace(/"/g, '""')}"`;
+        }
+        return cellStr;
+      }).join(',')).join('\n');
+      
+      // Create and download the file
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'clusters_export.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } catch (err: any) {
       console.error('Export error:', err);
       setError(err.response?.data?.error || 'Export failed');
