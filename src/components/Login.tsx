@@ -101,7 +101,7 @@ const Login: React.FC = () => {
           }}
         >
           <Typography variant="h4" component="h1" gutterBottom sx={{ pt: 3, fontWeight: 700 }}>
-            LP App Name Deduplicator
+            License Patrol Matcha
           </Typography>
 
           <Tabs

@@ -54,7 +54,7 @@ const Navbar: React.FC = () => {
     <Box sx={{ width: 250 }} role="presentation">
       <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
         <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold' }}>
-          App Name Deduplicator
+          License Patrol Matcha
         </Typography>
       </Box>
       <Divider />
@@ -143,7 +143,7 @@ const Navbar: React.FC = () => {
               fontWeight: 'bold',
             }}
           >
-            App Name Deduplicator
+            License Patrol Matcha
           </Typography>
         </Toolbar>
       </AppBar>

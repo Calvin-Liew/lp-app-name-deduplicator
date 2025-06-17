@@ -1,4 +1,4 @@
-# App Name Deduplicator
+# License Patrol Matcha
 
 A React application that helps you deduplicate and organize app names through a semi-manual review process.
 
@@ -36,8 +36,7 @@ npm start
 ## Input File Format
 
 Create a text file with one app name per line. For example:
-```
-Zoom
+```Zoom
 Zoom Pro
 Zoom Meetings
 Microsoft Teams

@@ -165,7 +165,7 @@ const Dashboard: React.FC = () => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            LP App Name Deduplicator
+            License Patrol Matcha
           </Typography>
           <Typography variant="body1" sx={{ mr: 2 }}>
             {user?.name}
