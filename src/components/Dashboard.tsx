@@ -215,9 +215,9 @@ const Dashboard: React.FC = () => {
           {/* User Progress Section */}
           <Card sx={{ 
             mb: 3, 
-            background: 'linear-gradient(135deg, #6B7AFF 0%, #8B9AFF 100%)', 
+            background: 'linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%)', 
             color: 'white',
-            boxShadow: '0 4px 20px rgba(107, 122, 255, 0.2)'
+            boxShadow: '0 4px 20px rgba(46, 125, 50, 0.2)'
           }}>
             <CardContent>
               <Grid container spacing={2} alignItems="center">
@@ -227,9 +227,9 @@ const Dashboard: React.FC = () => {
                       sx={{ 
                         width: 64, 
                         height: 64, 
-                        bgcolor: '#8B9AFF',
+                        bgcolor: '#4CAF50',
                         border: '3px solid white',
-                        boxShadow: '0 4px 12px rgba(139, 154, 255, 0.3)'
+                        boxShadow: '0 4px 12px rgba(76, 175, 80, 0.3)'
                       }}
                     >
                       {user?.name?.[0]?.toUpperCase()}
@@ -248,114 +248,148 @@ const Dashboard: React.FC = () => {
                       icon={<FireIcon sx={{ color: 'white', fontSize: 20 }} />}
                       label={`${stats.streak} Day Streak`}
                       sx={{
-                        bgcolor: '#FF6B00',
+                        bgcolor: 'rgba(255, 255, 255, 0.2)',
                         color: 'white',
-                        '& .MuiChip-label': { fontWeight: 600 },
-                        '&:hover': {
-                          bgcolor: '#E65C00',
-                        },
+                        '& .MuiChip-icon': {
+                          color: 'white'
+                        }
                       }}
                     />
                     <Chip
-                      icon={<CheckCircleIcon sx={{ color: 'white', fontSize: 20 }} />}
-                      label={`${stats.personalConfirmedApps} Confirmed by You`}
+                      icon={<TrophyIcon sx={{ color: 'white', fontSize: 20 }} />}
+                      label={`${stats.achievements?.filter(a => a.unlocked).length || 0} Achievements`}
                       sx={{
-                        bgcolor: '#00C853',
+                        bgcolor: 'rgba(255, 255, 255, 0.2)',
                         color: 'white',
-                        '& .MuiChip-label': { fontWeight: 600 },
-                        '&:hover': {
-                          bgcolor: '#00B248',
-                        },
+                        '& .MuiChip-icon': {
+                          color: 'white'
+                        }
                       }}
                     />
                   </Box>
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <Box sx={{ mb: 1 }}>
-                    <Typography variant="body2" sx={{ mb: 0.5, opacity: 0.9 }}>
-                      Progress to Level {(stats.level || 1) + 1}
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="body2" sx={{ mb: 1, opacity: 0.9 }}>
+                      Progress to Level {stats.level ? stats.level + 1 : 2}
                     </Typography>
                     <LinearProgress 
                       variant="determinate" 
                       value={calculateLevelProgress()} 
-                      sx={{ 
-                        height: 10, 
-                        borderRadius: 5,
-                        bgcolor: 'rgba(255,255,255,0.25)',
+                      sx={{
+                        height: 8,
+                        borderRadius: 4,
+                        bgcolor: 'rgba(255, 255, 255, 0.2)',
                         '& .MuiLinearProgress-bar': {
-                          bgcolor: 'white',
-                          boxShadow: '0 0 10px rgba(255,255,255,0.5)'
+                          bgcolor: 'white'
                         }
-                      }} 
+                      }}
                     />
-                    <Typography variant="caption" sx={{ mt: 0.5, display: 'block', opacity: 0.9 }}>
-                      {Math.round(calculateLevelProgress())}% Complete
-                    </Typography>
                   </Box>
                 </Grid>
               </Grid>
             </CardContent>
           </Card>
 
-          {/* Stats Cards */}
+          {/* Stats Grid */}
           <Grid container spacing={3}>
-            <Grid item xs={12} sm={6} md={4}>
-              <Card 
-                sx={{ 
-                  cursor: 'pointer',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: 3
-                  }
-                }}
-                onClick={() => navigate('/apps')}
-              >
+            <Grid item xs={12} sm={6} md={3}>
+              <Card sx={{ 
+                bgcolor: '#E8F5E9',
+                border: '1px solid #C8E6C9',
+                '&:hover': {
+                  boxShadow: '0 4px 20px rgba(46, 125, 50, 0.1)'
+                }
+              }}>
                 <CardContent>
-                  <Typography color="textSecondary" gutterBottom>
-                    Total Apps
-                  </Typography>
-                  <Typography variant="h4">{stats.totalApps || 0}</Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Avatar sx={{ bgcolor: '#4CAF50', width: 48, height: 48 }}>
+                      <AppsIcon />
+                    </Avatar>
+                    <Box>
+                      <Typography variant="h6" color="primary">
+                        {stats.totalApps}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Total Apps
+                      </Typography>
+                    </Box>
+                  </Box>
                 </CardContent>
               </Card>
             </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <Card 
-                sx={{ 
-                  cursor: 'pointer',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: 3
-                  }
-                }}
-                onClick={() => navigate('/unconfirmed')}
-              >
+            <Grid item xs={12} sm={6} md={3}>
+              <Card sx={{ 
+                bgcolor: '#E8F5E9',
+                border: '1px solid #C8E6C9',
+                '&:hover': {
+                  boxShadow: '0 4px 20px rgba(46, 125, 50, 0.1)'
+                }
+              }}>
                 <CardContent>
-                  <Typography color="textSecondary" gutterBottom>
-                    Unconfirmed Apps
-                  </Typography>
-                  <Typography variant="h4">{stats.unconfirmedApps || 0}</Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Avatar sx={{ bgcolor: '#4CAF50', width: 48, height: 48 }}>
+                      <CheckCircleIcon />
+                    </Avatar>
+                    <Box>
+                      <Typography variant="h6" color="primary">
+                        {stats.confirmedApps}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Confirmed Apps
+                      </Typography>
+                    </Box>
+                  </Box>
                 </CardContent>
               </Card>
             </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <Card 
-                sx={{ 
-                  cursor: 'pointer',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: 3
-                  }
-                }}
-                onClick={() => navigate('/confirmed')}
-              >
+            <Grid item xs={12} sm={6} md={3}>
+              <Card sx={{ 
+                bgcolor: '#E8F5E9',
+                border: '1px solid #C8E6C9',
+                '&:hover': {
+                  boxShadow: '0 4px 20px rgba(46, 125, 50, 0.1)'
+                }
+              }}>
                 <CardContent>
-                  <Typography color="textSecondary" gutterBottom>
-                    Confirmed Apps
-                  </Typography>
-                  <Typography variant="h4">{stats.confirmedApps || 0}</Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Avatar sx={{ bgcolor: '#4CAF50', width: 48, height: 48 }}>
+                      <PendingIcon />
+                    </Avatar>
+                    <Box>
+                      <Typography variant="h6" color="primary">
+                        {stats.unconfirmedApps}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Pending Review
+                      </Typography>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card sx={{ 
+                bgcolor: '#E8F5E9',
+                border: '1px solid #C8E6C9',
+                '&:hover': {
+                  boxShadow: '0 4px 20px rgba(46, 125, 50, 0.1)'
+                }
+              }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Avatar sx={{ bgcolor: '#4CAF50', width: 48, height: 48 }}>
+                      <GroupsIcon />
+                    </Avatar>
+                    <Box>
+                      <Typography variant="h6" color="primary">
+                        {stats.teamStats?.totalUsers || 0}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Team Members
+                      </Typography>
+                    </Box>
+                  </Box>
                 </CardContent>
               </Card>
             </Grid>
