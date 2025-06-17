@@ -256,8 +256,8 @@ const Dashboard: React.FC = () => {
                       }}
                     />
                     <Chip
-                      icon={<TrophyIcon sx={{ color: 'white', fontSize: 20 }} />}
-                      label={`${stats.achievements?.filter(a => a.unlocked).length || 0} Achievements`}
+                      icon={<CheckCircleIcon sx={{ color: 'white', fontSize: 20 }} />}
+                      label={`${stats.personalConfirmedApps || 0} Confirmed by You`}
                       sx={{
                         bgcolor: 'rgba(255, 255, 255, 0.2)',
                         color: 'white',
@@ -293,7 +293,7 @@ const Dashboard: React.FC = () => {
 
           {/* Stats Grid */}
           <Grid container spacing={3}>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={12} sm={6} md={4}>
               <Card sx={{ 
                 bgcolor: '#E8F5E9',
                 border: '1px solid #C8E6C9',
@@ -318,7 +318,7 @@ const Dashboard: React.FC = () => {
                 </CardContent>
               </Card>
             </Grid>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={12} sm={6} md={4}>
               <Card sx={{ 
                 bgcolor: '#E8F5E9',
                 border: '1px solid #C8E6C9',
@@ -343,7 +343,7 @@ const Dashboard: React.FC = () => {
                 </CardContent>
               </Card>
             </Grid>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={12} sm={6} md={4}>
               <Card sx={{ 
                 bgcolor: '#E8F5E9',
                 border: '1px solid #C8E6C9',
@@ -362,31 +362,6 @@ const Dashboard: React.FC = () => {
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
                         Pending Review
-                      </Typography>
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <Card sx={{ 
-                bgcolor: '#E8F5E9',
-                border: '1px solid #C8E6C9',
-                '&:hover': {
-                  boxShadow: '0 4px 20px rgba(46, 125, 50, 0.1)'
-                }
-              }}>
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Avatar sx={{ bgcolor: '#4CAF50', width: 48, height: 48 }}>
-                      <GroupsIcon />
-                    </Avatar>
-                    <Box>
-                      <Typography variant="h6" color="primary">
-                        {stats.teamStats?.totalUsers || 0}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Team Members
                       </Typography>
                     </Box>
                   </Box>
